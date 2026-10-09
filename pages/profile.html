@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil Admin — SIGAP</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" />
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="icon" type="image/x-icon" href="../assets/images/logo-sekolah.png">
+
+    <style>
+        /* ── Profile-specific styles ───────────────────── */
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hero card */
+        .profile-hero {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+            border-radius: var(--radius-lg);
+            padding: 36px 32px;
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            animation: cardIn 0.4s ease both;
+        }
+
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+        }
+
+        .profile-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 120px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+        }
+
+        .profile-avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .profile-avatar {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            font-family: var(--font-body);
+            letter-spacing: -1px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .profile-avatar:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+            font-size: 18px;
+            color: white;
+        }
+
+        .avatar-badge {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 26px;
+            height: 26px;
+            background: var(--success);
+            border: 2.5px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-badge i {
+            font-size: 10px;
+            color: white;
+        }
+
+        .profile-hero-info {
+            flex: 1;
+            z-index: 2;
+        }
+
+        .profile-hero-info .hero-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        .profile-hero-info .hero-role {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-role .role-badge {
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.4px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+        }
+
+        .hero-meta-item i {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .profile-hero-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .btn-hero {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 9px 18px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            border: none;
+            min-width: 140px;
+        }
+
+        .btn-hero-white {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        .btn-hero-white:hover {
+            background: var(--gray-100);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-hero-ghost {
+            background: rgba(255, 255, 255, 0.14);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-hero-ghost:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        /* Profile layout grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Card base */
+        .profile-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            animation: cardIn 0.45s ease both;
+        }
+
+        .profile-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .profile-card:nth-child(2) {
+            animation-delay: 0.10s;
+        }
+
+        .profile-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .card-header-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header-section h3 i {
+            width: 28px;
+            height: 28px;
+            background: var(--primary-xlight);
+            color: var(--primary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .card-body-section {
+            padding: 20px;
+        }
+
+        /* Info list (left panel) */
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .info-list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .info-list-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-list-item:first-child {
+            padding-top: 0;
+        }
+
+        .info-list-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-md);
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--gray-500);
+            font-size: 13px;
+        }
+
+        .info-list-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .info-list-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--gray-400);
+            margin-bottom: 2px;
+        }
+
+        .info-list-value {
+            font-size: 13.5px;
+            color: var(--gray-800);
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        /* Stat chips on left panel */
+        .stat-chips {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .stat-chip {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-chip .chip-num {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1.1;
+            margin-bottom: 3px;
+        }
+
+        .stat-chip .chip-label {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        .stat-chip.primary {
+            background: var(--primary-xlight);
+            border-color: rgba(26, 79, 160, 0.15);
+        }
+
+        .stat-chip.primary .chip-num {
+            color: var(--primary);
+        }
+
+        /* Form section (right panel) */
+        .profile-tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 20px;
+            background: var(--white);
+        }
+
+        .profile-tab {
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-500);
+            border: none;
+            background: none;
+            border-bottom: 2.5px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: all var(--transition-fast);
+            margin-bottom: -1px;
+        }
+
+        .profile-tab:hover {
+            color: var(--gray-700);
+        }
+
+        .profile-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .profile-tab i {
+            font-size: 12px;
+        }
+
+        .tab-pane {
+            display: none;
+            padding: 24px;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Form rows */
+        .form-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-100);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-grid.cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .form-grid.cols-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.span-2 {
+            grid-column: span 2;
+        }
+
+        .form-label-pro {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+
+        .form-label-pro span.req {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        .input-pro {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 13.5px;
+            color: var(--gray-800);
+            background: var(--gray-50);
+            font-family: var(--font-body);
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .input-pro:focus {
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(26, 79, 160, 0.10);
+        }
+
+        .input-pro:disabled {
+            background: var(--gray-100);
+            color: var(--gray-500);
+            cursor: not-allowed;
+        }
+
+        .input-pro.is-invalid {
+            border-color: var(--danger);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon .input-pro {
+            padding-left: 38px;
+        }
+
+        .input-with-icon .i-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .input-hint {
+            font-size: 11.5px;
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        /* Password strength bar */
+        .pw-strength {
+            margin-top: 8px;
+        }
+
+        .pw-strength-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: var(--gray-500);
+            margin-bottom: 5px;
+        }
+
+        .pw-strength-bar {
+            height: 4px;
+            border-radius: var(--radius-full);
+            background: var(--gray-200);
+            overflow: hidden;
+        }
+
+        .pw-strength-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            width: 0%;
+            transition: width 0.4s ease, background 0.4s ease;
+        }
+
+        /* Form actions */
+        .form-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-100);
+            margin-top: 8px;
+        }
+
+        .btn-cancel-pro {
+            padding: 9px 20px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-600);
+            background: var(--white);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-cancel-pro:hover {
+            border-color: var(--gray-300);
+            background: var(--gray-50);
+        }
+
+        .btn-save-pro {
+            padding: 9px 22px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            background: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: all var(--transition-fast);
+            box-shadow: 0 2px 8px rgba(26, 79, 160, 0.3);
+        }
+
+        .btn-save-pro:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(26, 79, 160, 0.4);
+        }
+
+        .btn-save-pro:disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Activity log (tab ketiga) */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--gray-100);
+            position: relative;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-dot-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .activity-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .activity-dot.login {
+            background: var(--primary-xlight);
+            color: var(--primary);
+        }
+
+        .activity-dot.edit {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .activity-dot.input {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .activity-dot.laporan {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 2px;
+        }
+
+        .activity-desc {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .activity-time {
+            font-size: 11.5px;
+            color: var(--gray-400);
+            font-family: var(--font-mono);
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+
+        /* Danger zone */
+        .danger-zone {
+            border: 1.5px solid var(--danger-light);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            background: #fff8f8;
+            margin-top: 4px;
+        }
+
+        .danger-zone h4 {
+            font-size: 13px;
+            color: var(--danger);
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .danger-zone p {
+            font-size: 12.5px;
+            color: var(--gray-500);
+            margin-bottom: 12px;
+        }
+
+        .btn-danger-ghost {
+            padding: 8px 16px;
+            border: 1.5px solid var(--danger);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--danger);
+            background: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-danger-ghost:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Session list */
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-device {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--gray-500);
+            flex-shrink: 0;
+        }
+
+        .session-info {
+            flex: 1;
+        }
+
+        .session-info strong {
+            font-size: 13px;
+            display: block;
+            color: var(--gray-800);
+        }
+
+        .session-info span {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .session-current {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--success);
+            background: var(--success-light);
+            padding: 2px 9px;
+            border-radius: var(--radius-full);
+        }
+
+        .btn-revoke {
+            font-size: 12px;
+            color: var(--danger);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .btn-revoke:hover {
+            background: var(--danger-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-hero {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-meta {
+                justify-content: center;
+            }
+
+            .profile-hero-actions {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid.cols-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.span-2 {
+                grid-column: span 1;
+            }
+
+            .stat-chips {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* ════════════════════════════════════════════════════════
+           DARK MODE — PROFIL
+        ════════════════════════════════════════════════════════ */
+
+        :root {
+            --dm-bg: #0f172a;
+            --dm-surface: #1e293b;
+            --dm-surface-2: #253348;
+            --dm-surface-3: #2d3f55;
+            --dm-border: #2e3f55;
+            --dm-border-strong: #3d5068;
+            --dm-text: #e2e8f0;
+            --dm-text-2: #94a3b8;
+            --dm-text-3: #64748b;
+            --dm-accent: #3b82f6;
+            --dm-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+            --dm-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+            --dm-sidebar: #0d1829;
+            --dm-topbar: rgba(13, 24, 41, 0.95);
+        }
+
+        html.dark-transitioning *,
+        html.dark-transitioning *::before,
+        html.dark-transitioning *::after {
+            transition:
+                background-color 0.22s ease,
+                border-color 0.22s ease,
+                color 0.18s ease,
+                box-shadow 0.22s ease !important;
+        }
+
+        /* ── Body ─────────────────────────────────────────────── */
+        html.dark body {
+            background: var(--dm-bg) !important;
+            background-image: none !important;
+            color: var(--dm-text) !important;
+        }
+
+        /* ── Sidebar ──────────────────────────────────────────── */
+        html.dark .sidebar {
+            background: var(--dm-sidebar) !important;
+            border-right: 1px solid var(--dm-border) !important;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .sidebar-brand {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .sidebar-brand-logo {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar-brand-text strong {
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .sidebar-brand-text small {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        html.dark .sidebar-brand {
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .sidebar-brand-logo {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        html.dark .sidebar-brand-text strong {
+            color: #fff !important;
+        }
+
+        html.dark .sidebar-brand-text small {
+            color: rgba(255, 255, 255, 0.35) !important;
+        }
+
+        html.dark .sidebar-nav a {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .sidebar-nav a:hover {
+            background: rgba(255, 255, 255, 0.06) !important;
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .sidebar-nav a.active {
+            background: rgba(59, 130, 246, 0.15) !important;
+            color: #60a5fa !important;
+        }
+
+        html.dark .sidebar-nav a.active::before {
+            background: #60a5fa !important;
+        }
+
+        html.dark .sidebar-section-label {
+            color: rgba(100, 116, 139, 0.7) !important;
+        }
+
+        html.dark .sidebar-divider {
+            border-color: var(--dm-border) !important;
+            background: var(--dm-border) !important;
+        }
+
+        html.dark .sidebar-footer {
+            border-top-color: var(--dm-border) !important;
+        }
+
+        html.dark .sidebar-user-info strong {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .sidebar-user-info span {
+            color: var(--dm-text-2) !important;
+        }
+
+        /* ── Topbar ───────────────────────────────────────────── */
+        html.dark .topbar {
+            background: var(--dm-topbar) !important;
+            border-bottom-color: var(--dm-border) !important;
+            box-shadow: 0 1px 0 var(--dm-border), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(20px) !important;
+        }
+
+        html.dark .topbar-page-title {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .topbar-breadcrumb {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .topbar-hamburger {
+            color: var(--dm-text-2) !important;
+            background: transparent !important;
+        }
+
+        html.dark .topbar-hamburger:hover {
+            background: rgba(255, 255, 255, 0.06) !important;
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .topbar-user {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: var(--dm-border) !important;
+        }
+
+        html.dark .topbar-user:hover {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-accent) !important;
+        }
+
+        html.dark .topbar-user-name {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .btn-logout {
+            background: rgba(220, 38, 38, 0.12) !important;
+            border-color: rgba(220, 38, 38, 0.3) !important;
+            color: #f87171 !important;
+        }
+
+        html.dark .btn-logout:hover {
+            background: rgba(220, 38, 38, 0.22) !important;
+            border-color: #f87171 !important;
+        }
+
+        /* ── Dark mode toggle button ───────────────────────────── */
+        .btn-darkmode {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .btn-darkmode:hover {
+            border-color: #1a4fa0;
+            color: #1a4fa0;
+            background: #eff6ff;
+        }
+
+        html.dark .btn-darkmode {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: var(--dm-border) !important;
+            color: #fbbf24 !important;
+        }
+
+        html.dark .btn-darkmode:hover {
+            background: rgba(251, 191, 36, 0.12) !important;
+            border-color: #fbbf24 !important;
+            color: #fcd34d !important;
+        }
+
+        /* ── Hero card (keep tinted gradient, soften edges) ────── */
+        html.dark .profile-hero {
+            box-shadow: var(--dm-shadow);
+        }
+
+        html.dark .avatar-badge {
+            border-color: var(--dm-surface) !important;
+        }
+
+        /* ── Profile cards ──────────────────────────────────────── */
+        html.dark .profile-card {
+            background: var(--dm-surface) !important;
+            border-color: var(--dm-border) !important;
+            box-shadow: var(--dm-shadow-sm) !important;
+        }
+
+        html.dark .card-header-section {
+            background: var(--dm-surface-2) !important;
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .card-header-section h3 {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .card-header-section h3 i {
+            background: rgba(59, 130, 246, 0.15) !important;
+            color: #60a5fa !important;
+        }
+
+        /* ── Info list (left panel) ─────────────────────────────── */
+        html.dark .info-list-item {
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .info-list-icon {
+            background: var(--dm-surface-2) !important;
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .info-list-label {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .info-list-value {
+            color: var(--dm-text) !important;
+        }
+
+        /* ── Stat chips ──────────────────────────────────────────── */
+        html.dark .stat-chip {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-border) !important;
+        }
+
+        html.dark .stat-chip .chip-num {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .stat-chip .chip-label {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .stat-chip.primary {
+            background: rgba(59, 130, 246, 0.12) !important;
+            border-color: rgba(59, 130, 246, 0.25) !important;
+        }
+
+        html.dark .stat-chip.primary .chip-num {
+            color: #60a5fa !important;
+        }
+
+        /* ── Tabs ────────────────────────────────────────────────── */
+        html.dark .profile-tabs {
+            background: var(--dm-surface) !important;
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .profile-tab {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .profile-tab:hover {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .profile-tab.active {
+            color: #60a5fa !important;
+            border-bottom-color: #60a5fa !important;
+        }
+
+        /* ── Form section ────────────────────────────────────────── */
+        html.dark .form-section-title {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .form-section-title::after {
+            background: var(--dm-border) !important;
+        }
+
+        html.dark .form-label-pro {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .input-pro {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-border) !important;
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .input-pro::placeholder {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .input-pro:focus {
+            background: var(--dm-surface-3) !important;
+            border-color: var(--dm-accent) !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+        }
+
+        html.dark .input-pro:disabled {
+            background: var(--dm-surface) !important;
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .input-with-icon .i-icon {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .input-hint {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .password-toggle {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .pw-req {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .pw-strength-bar {
+            background: var(--dm-surface-3) !important;
+        }
+
+        html.dark .pw-strength-label {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .pw-hint-box {
+            background: rgba(59, 130, 246, 0.1) !important;
+            border-color: rgba(59, 130, 246, 0.25) !important;
+        }
+
+        html.dark .pw-hint-box>div {
+            color: #60a5fa !important;
+        }
+
+        /* ── Form actions ────────────────────────────────────────── */
+        html.dark .form-actions {
+            border-top-color: var(--dm-border) !important;
+        }
+
+        html.dark .btn-cancel-pro {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-border) !important;
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .btn-cancel-pro:hover {
+            border-color: var(--dm-accent) !important;
+            color: var(--dm-text) !important;
+            background: var(--dm-surface-3) !important;
+        }
+
+        /* ── Activity log ────────────────────────────────────────── */
+        html.dark .activity-item {
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .activity-title {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .activity-desc {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .activity-time {
+            color: var(--dm-text-3) !important;
+        }
+
+        /* ── Danger zone ─────────────────────────────────────────── */
+        html.dark .danger-zone {
+            background: rgba(220, 38, 38, 0.08) !important;
+            border-color: rgba(220, 38, 38, 0.3) !important;
+        }
+
+        html.dark .danger-zone p {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .btn-danger-ghost:hover {
+            background: #ef4444 !important;
+            color: white !important;
+        }
+
+        /* ── Session list ────────────────────────────────────────── */
+        html.dark .session-item {
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .session-device {
+            background: var(--dm-surface-2) !important;
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .session-info strong {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .session-info span {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .session-current {
+            background: rgba(34, 197, 94, 0.15) !important;
+            color: #4ade80 !important;
+        }
+
+        html.dark .btn-revoke:hover {
+            background: rgba(220, 38, 38, 0.15) !important;
+        }
+
+        html.dark .divider {
+            background: var(--dm-border) !important;
+        }
+
+        /* ── Badges ──────────────────────────────────────────────── */
+        html.dark .badge-primary {
+            background: rgba(59, 130, 246, 0.18) !important;
+            color: #93c5fd !important;
+        }
+
+        /* ── Scrollbar ───────────────────────────────────────────── */
+        html.dark ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        html.dark ::-webkit-scrollbar-track {
+            background: var(--dm-bg);
+        }
+
+        html.dark ::-webkit-scrollbar-thumb {
+            background: var(--dm-border-strong);
+            border-radius: 999px;
+        }
+
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: #4a6080;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-wrapper">
+
+        <!-- Sidebar overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- ══════════════════ SIDEBAR ══════════════════ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-logo">
+                    <img src="../assets/images/logo-sekolah.png" alt="Logo SMK Negeri 1 Masbagik"
+                        style="width:30px; height:30px; object-fit:contain;">
+                </div>
+                <div class="sidebar-brand-text">
+                    <strong>SIGAP</strong>
+                    <small id="sb-school">SMKN 1 Masbagik</small>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Menu Utama</div>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+                <a href="data-siswa.html"><i class="fa-solid fa-users"></i><span>Data Siswa</span></a>
+                <a href="input-pelanggaran.html"><i class="fa-solid fa-circle-plus"></i><span>Input
+                        Pelanggaran</span></a>
+                <a href="riwayat.html"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></a>
+                <a href="laporan.html"><i class="fa-solid fa-chart-pie"></i><span>Laporan</span></a>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-section-label">Akun</div>
+                <a href="profile.html" class="active"><i class="fa-solid fa-user-circle"></i><span>Profil
+                        Saya</span></a>
+                <a href="#" data-logout><i class="fa-solid fa-right-from-bracket"></i><span>Keluar</span></a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-user-avatar" id="sb-avatar">SW</div>
+                    <div class="sidebar-user-info">
+                        <strong id="sb-username">Sri Wahyuni</strong>
+                        <span id="sb-role">Guru BK</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ══════════════════ TOPBAR ══════════════════ -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-hamburger" id="hamburger-btn" aria-label="Toggle menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div>
+                    <div class="topbar-page-title" id="topbar-title">Profil Admin</div>
+                    <div class="topbar-breadcrumb">
+                        <i class="fa-solid fa-house sep" style="font-size:9px"></i>
+                        <span>Akun</span>
+                        <i class="fa-solid fa-chevron-right sep" style="font-size:8px"></i>
+                        <span>Profil Saya</span>
+                    </div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <!-- Dark Mode Toggle -->
+                <button class="btn-darkmode" id="btn-darkmode" title="Ganti tema gelap/terang"
+                    aria-label="Toggle dark mode">
+                    <i class="fa-solid fa-moon" id="dm-icon"></i>
+                </button>
+                <div class="topbar-user">
+                    <div class="topbar-avatar" id="topbar-avatar">SW</div>
+                    <span class="topbar-user-name" id="topbar-username">Sri Wahyuni</span>
+                </div>
+                <button class="btn-logout" data-logout>
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Keluar
+                </button>
+            </div>
+        </header>
+
+        <!-- ══════════════════ MAIN CONTENT ══════════════════ -->
+        <main class="main-content">
+
+            <!-- Hero Card -->
+            <div class="profile-hero">
+                <div class="profile-avatar-wrap">
+                    <div class="profile-avatar" id="avatar-display"
+                        onclick="document.getElementById('avatar-input').click()" title="Klik untuk ganti foto">
+                        <img src="" alt="" id="avatar-img" />
+                        <span id="avatar-initials">SW</span>
+                        <div class="avatar-overlay"><i class="fa-solid fa-camera"></i></div>
+                    </div>
+                    <div class="avatar-badge"><i class="fa-solid fa-check"></i></div>
+                    <input type="file" id="avatar-input" accept="image/*" style="display:none" />
+                </div>
+
+                <div class="profile-hero-info">
+                    <div class="hero-name" id="hero-name">Dra. Sri Wahyuni, M.Pd.</div>
+                    <div class="hero-role">
+                        <span id="hero-nip" style="font-family: var(--font-mono); font-size:12px;">NIP:
+                            197203151998022001</span>
+                        <span class="role-badge">Guru BK</span>
+                        <span class="role-badge"
+                            style="background: rgba(34,197,94,0.25); border-color: rgba(34,197,94,0.35);">Administrator</span>
+                    </div>
+                    <div class="hero-meta">
+                        <div class="hero-meta-item">
+                            <i class="fa-solid fa-school"></i>
+                            <span id="hero-school">SMK Negeri 1 Surakarta</span>
+                        </div>
+                        <div class="hero-meta-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span id="hero-email">sri.wahyuni@smkn1ska.sch.id</span>
+                        </div>
+                        <div class="hero-meta-item">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span id="hero-wa">08112345678</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-hero-actions">
+                    <button class="btn-hero btn-hero-white" onclick="switchTab('tab-info')">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        Edit Profil
+                    </button>
+                    <button class="btn-hero btn-hero-ghost" onclick="switchTab('tab-password')">
+                        <i class="fa-solid fa-lock"></i>
+                        Ubah Password
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Grid -->
+            <div class="profile-grid">
+
+                <!-- ── Left Panel: Info Ringkas ── -->
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                    <!-- Informasi Akun -->
+                    <div class="profile-card">
+                        <div class="card-header-section">
+                            <h3><i class="fa-solid fa-id-card"></i> Informasi Akun</h3>
+                        </div>
+                        <div class="card-body-section">
+                            <div class="info-list">
+                                <div class="info-list-item">
+                                    <div class="info-list-icon"><i class="fa-solid fa-user"></i></div>
+                                    <div class="info-list-content">
+                                        <div class="info-list-label">Username</div>
+                                        <div class="info-list-value" id="info-username">sri.wahyuni</div>
+                                    </div>
+                                </div>
+                                <div class="info-list-item">
+                                    <div class="info-list-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                                    <div class="info-list-content">
+                                        <div class="info-list-label">Role / Hak Akses</div>
+                                        <div class="info-list-value">
+                                            <span class="badge badge-primary"
+                                                style="font-size:11.5px;">Administrator</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-list-item">
+                                    <div class="info-list-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                                    <div class="info-list-content">
+                                        <div class="info-list-label">Bergabung Sejak</div>
+                                        <div class="info-list-value" id="info-join-date">1 Januari 2024</div>
+                                    </div>
+                                </div>
+                                <div class="info-list-item">
+                                    <div class="info-list-icon"><i class="fa-solid fa-clock"></i></div>
+                                    <div class="info-list-content">
+                                        <div class="info-list-label">Login Terakhir</div>
+                                        <div class="info-list-value" id="info-last-login">Hari ini, 07:45</div>
+                                    </div>
+                                </div>
+                                <div class="info-list-item">
+                                    <div class="info-list-icon"><i class="fa-solid fa-circle-dot"></i></div>
+                                    <div class="info-list-content">
+                                        <div class="info-list-label">Status Akun</div>
+                                        <div class="info-list-value">
+                                            <span
+                                                style="display:inline-flex; align-items:center; gap:5px; color:var(--success); font-weight:600; font-size:13px;">
+                                                <span class="dot dot-success"></span> Aktif
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistik Aktivitas -->
+                    <div class="profile-card">
+                        <div class="card-header-section">
+                            <h3><i class="fa-solid fa-chart-simple"></i> Statistik Aktivitas</h3>
+                        </div>
+                        <div class="card-body-section">
+                            <div class="stat-chips">
+                                <div class="stat-chip primary">
+                                    <div class="chip-num" id="stat-pelanggaran">—</div>
+                                    <div class="chip-label">Total Input</div>
+                                </div>
+                                <div class="stat-chip">
+                                    <div class="chip-num" id="stat-siswa">—</div>
+                                    <div class="chip-label">Siswa Dikelola</div>
+                                </div>
+                                <div class="stat-chip">
+                                    <div class="chip-num" id="stat-bulan">—</div>
+                                    <div class="chip-label">Bulan Ini</div>
+                                </div>
+                                <div class="stat-chip">
+                                    <div class="chip-num" id="stat-wa">—</div>
+                                    <div class="chip-label">WA Terkirim</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ── Right Panel: Form Tabs ── -->
+                <div class="profile-card" style="overflow: visible;">
+                    <!-- Tab Bar -->
+                    <div class="profile-tabs">
+                        <button class="profile-tab active" onclick="switchTab('tab-info')" data-tab="tab-info">
+                            <i class="fa-solid fa-pen"></i> Edit Profil
+                        </button>
+                        <button class="profile-tab" onclick="switchTab('tab-password')" data-tab="tab-password">
+                            <i class="fa-solid fa-lock"></i> Password
+                        </button>
+                        <button class="profile-tab" onclick="switchTab('tab-activity')" data-tab="tab-activity">
+                            <i class="fa-solid fa-list-ul"></i> Aktivitas
+                        </button>
+                        <button class="profile-tab" onclick="switchTab('tab-session')" data-tab="tab-session">
+                            <i class="fa-solid fa-laptop"></i> Sesi
+                        </button>
+                    </div>
+
+                    <!-- ── TAB 1: Edit Profil ── -->
+                    <div class="tab-pane active" id="tab-info">
+                        <div class="form-section-title">Informasi Pribadi</div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label-pro">Nama Lengkap <span class="req">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="i-icon fa-solid fa-user"></i>
+                                    <input type="text" class="input-pro" id="field-nama" value="Dra. Sri Wahyuni, M.Pd."
+                                        placeholder="Nama lengkap" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-pro">NIP</label>
+                                <div class="input-with-icon">
+                                    <i class="i-icon fa-solid fa-id-badge"></i>
+                                    <input type="text" class="input-pro" id="field-nip" value="197203151998022001"
+                                        style="font-family: var(--font-mono);" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-pro">Email <span class="req">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="i-icon fa-solid fa-envelope"></i>
+                                    <input type="email" class="input-pro" id="field-email"
+                                        value="sri.wahyuni@smkn1ska.sch.id" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-pro">No. WhatsApp BK <span class="req">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="i-icon fa-brands fa-whatsapp"></i>
+                                    <input type="text" class="input-pro" id="field-wa" value="08112345678"
+                                        placeholder="628xxxxxxx" style="font-family: var(--font-mono);" />
+                                </div>
+                                <span class="input-hint">Nomor ini digunakan untuk pengiriman notifikasi WA siswa</span>
+                            </div>
+                        </div>
+
+                        <div class="form-section-title">Informasi Sistem</div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label-pro">Nama Sekolah</label>
+                                <div class="input-with-icon">
+                                    <i class="i-icon fa-solid fa-school"></i>
+                                    <input type="text" class="input-pro" id="field-sekolah"
+                                        value="SMK Negeri 1 Surakarta" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-pro">Tahun Ajaran</label>
+                                <div class="input-with-icon">
+                                    <i class="i-icon fa-solid fa-calendar"></i>
+                                    <input type="text" class="input-pro" value="2025/2026" disabled />
+                                </div>
+                                <span class="input-hint">Diatur oleh sistem, hubungi pengembang untuk mengubah</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-pro">Jabatan / Peran</label>
+                                <div class="input-with-icon">
+                                    <i class="i-icon fa-solid fa-briefcase"></i>
+                                    <input type="text" class="input-pro" value="Guru BK" disabled />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-pro">Username Login</label>
+                                <div class="input-with-icon">
+                                    <i class="i-icon fa-solid fa-at"></i>
+                                    <input type="text" class="input-pro" id="field-username" value="sri.wahyuni"
+                                        style="font-family: var(--font-mono);" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-cancel-pro" type="button" onclick="resetProfileForm()">
+                                <i class="fa-solid fa-rotate-left" style="font-size:11px;"></i> Reset
+                            </button>
+                            <button class="btn-save-pro" type="button" onclick="saveProfile()">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ── TAB 2: Password ── -->
+                    <div class="tab-pane" id="tab-password">
+                        <div class="form-section-title">Ubah Password</div>
+
+                        <div class="form-grid cols-1" style="max-width: 480px;">
+                            <div class="form-group">
+                                <label class="form-label-pro">Password Saat Ini <span class="req">*</span></label>
+                                <div class="input-with-icon" style="position:relative;">
+                                    <i class="i-icon fa-solid fa-lock"></i>
+                                    <input type="password" class="input-pro" id="pw-current"
+                                        placeholder="Masukkan password lama" />
+                                    <button type="button" class="password-toggle" onclick="togglePw('pw-current', this)"
+                                        style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--gray-400); cursor:pointer;">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-pro">Password Baru <span class="req">*</span></label>
+                                <div class="input-with-icon" style="position:relative;">
+                                    <i class="i-icon fa-solid fa-key"></i>
+                                    <input type="password" class="input-pro" id="pw-new" placeholder="Min. 8 karakter"
+                                        oninput="checkPasswordStrength(this.value)" />
+                                    <button type="button" class="password-toggle" onclick="togglePw('pw-new', this)"
+                                        style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--gray-400); cursor:pointer;">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="pw-strength" id="pw-strength-wrap" style="display:none;">
+                                    <div class="pw-strength-label">
+                                        <span>Kekuatan Password</span>
+                                        <span id="pw-strength-text">—</span>
+                                    </div>
+                                    <div class="pw-strength-bar">
+                                        <div class="pw-strength-fill" id="pw-strength-fill"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-pro">Konfirmasi Password Baru <span
+                                        class="req">*</span></label>
+                                <div class="input-with-icon" style="position:relative;">
+                                    <i class="i-icon fa-solid fa-key"></i>
+                                    <input type="password" class="input-pro" id="pw-confirm"
+                                        placeholder="Ulangi password baru" oninput="checkConfirm()" />
+                                    <button type="button" class="password-toggle" onclick="togglePw('pw-confirm', this)"
+                                        style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--gray-400); cursor:pointer;">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span class="input-hint" id="pw-match-msg"></span>
+                            </div>
+                        </div>
+
+                        <div class="pw-hint-box"
+                            style="background: var(--primary-xlight); border: 1px solid rgba(26,79,160,0.2); border-radius: var(--radius-md); padding: 14px 16px; max-width: 480px; margin-bottom: 20px;">
+                            <div style="font-size: 12px; font-weight: 600; color: var(--primary); margin-bottom: 8px;">
+                                <i class="fa-solid fa-circle-info" style="margin-right:5px;"></i>Syarat Password Kuat
+                            </div>
+                            <ul
+                                style="list-style: none; display: flex; flex-direction: column; gap: 5px; margin:0; padding:0;">
+                                <li id="req-len" class="pw-req"><i class="fa-solid fa-xmark"></i> Minimal 8 karakter
+                                </li>
+                                <li id="req-upper" class="pw-req"><i class="fa-solid fa-xmark"></i> Mengandung huruf
+                                    besar (A–Z)</li>
+                                <li id="req-num" class="pw-req"><i class="fa-solid fa-xmark"></i> Mengandung angka (0–9)
+                                </li>
+                                <li id="req-sym" class="pw-req"><i class="fa-solid fa-xmark"></i> Mengandung simbol
+                                    (!@#$...)</li>
+                            </ul>
+                        </div>
+                        <style>
+                            .pw-req {
+                                font-size: 12.5px;
+                                color: var(--gray-500);
+                                display: flex;
+                                align-items: center;
+                                gap: 7px;
+                            }
+
+                            .pw-req i {
+                                font-size: 11px;
+                                width: 14px;
+                            }
+
+                            .pw-req.ok {
+                                color: var(--success);
+                            }
+
+                            .pw-req.ok i::before {
+                                content: "\f00c";
+                            }
+                        </style>
+
+                        <div class="form-actions" style="max-width: 480px;">
+                            <button class="btn-cancel-pro" type="button" onclick="resetPasswordForm()">Batal</button>
+                            <button class="btn-save-pro" type="button" onclick="savePassword()">
+                                <i class="fa-solid fa-shield-halved"></i> Ubah Password
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ── TAB 3: Aktivitas ── -->
+                    <div class="tab-pane" id="tab-activity">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                            <div class="form-section-title" style="margin-bottom:0; flex:1;">Log Aktivitas Terbaru</div>
+                            <span style="font-size:12px; color:var(--gray-400);">30 hari terakhir</span>
+                        </div>
+
+                        <div class="activity-list" id="activity-list">
+                            <!-- Diisi oleh JS -->
+                            <div style="text-align:center; padding:40px; color:var(--gray-400);">
+                                <i class="fa-solid fa-rotate fa-spin" style="font-size:24px; margin-bottom:12px;"></i>
+                                <div style="font-size:13px;">Memuat aktivitas...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── TAB 4: Sesi Aktif ── -->
+                    <div class="tab-pane" id="tab-session">
+                        <div class="form-section-title">Sesi Login Aktif</div>
+
+                        <div id="session-list">
+                            <div class="session-item">
+                                <div class="session-device"><i class="fa-solid fa-desktop"></i></div>
+                                <div class="session-info">
+                                    <strong>Chrome — Windows 10</strong>
+                                    <span>Surakarta, Jawa Tengah · Sesi ini</span>
+                                </div>
+                                <span class="session-current">Aktif</span>
+                            </div>
+                            <div class="session-item">
+                                <div class="session-device"><i class="fa-solid fa-mobile-screen"></i></div>
+                                <div class="session-info">
+                                    <strong>Chrome Mobile — Android</strong>
+                                    <span>Terakhir aktif: 2 jam lalu</span>
+                                </div>
+                                <button class="btn-revoke"><i class="fa-solid fa-xmark"></i> Cabut</button>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="danger-zone">
+                            <h4><i class="fa-solid fa-triangle-exclamation"></i> Zona Berbahaya</h4>
+                            <p>Aksi di bawah ini bersifat permanen dan tidak dapat dibatalkan. Lakukan dengan hati-hati.
+                            </p>
+                            <button class="btn-danger-ghost" onclick="confirmLogoutAll()">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                Logout dari Semua Perangkat
+                            </button>
+                        </div>
+                    </div>
+
+                </div> <!-- end profile-card tabs -->
+            </div> <!-- end profile-grid -->
+
+        </main>
+    </div>
+
+    <!-- ═══ MODAL KONFIRMASI KELUAR ════════════════════════════════ -->
+    <div id="modalKeluarOverlay" style="
+    position:fixed; inset:0;
+    background:rgba(15,23,42,0.65);
+    z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+    backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none;
+    transition:opacity 250ms cubic-bezier(0.4,0,0.2,1);">
+
+        <div id="modal-keluar-content" style="
+      background:#ffffff;
+      border-radius:24px;
+      width:100%; max-width:360px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25), 0 8px 16px rgba(0,0,0,0.1);
+      text-align:center;
+      transform:scale(0.95) translateY(16px);
+      transition:transform 250ms cubic-bezier(0.4,0,0.2,1);
+      overflow:hidden;">
+
+            <!-- Body -->
+            <div style="padding:36px 28px 24px;">
+                <!-- Ikon bulat -->
+                <div style="
+          width:80px; height:80px; border-radius:50%;
+          background:#dc2626;
+          display:flex; align-items:center; justify-content:center;
+          margin:0 auto 20px;
+          box-shadow:0 8px 24px rgba(220,38,38,0.35);">
+                    <i class="fa-solid fa-right-from-bracket" style="color:#fff;font-size:28px;"></i>
+                </div>
+
+                <!-- Judul -->
+                <h5 id="modal-keluar-title" style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">
+                    Konfirmasi Keluar
+                </h5>
+
+                <!-- Pesan -->
+                <p id="modal-keluar-desc" style="font-size:14px;color:#64748b;margin:0;line-height:1.6;">
+                    Apakah Anda yakin ingin keluar dari aplikasi SIGAP?
+                </p>
+            </div>
+
+            <!-- Footer tombol -->
+            <div id="modal-keluar-footer" style="
+        display:flex; gap:10px;
+        padding:16px 24px;
+        border-top:1px solid #f1f5f9;
+        background:#f8fafc;">
+                <button type="button" id="btn-batal-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:1.5px solid #e2e8f0; background:#ffffff; color:#475569;
+          transition:background 150ms ease;">
+                    Batal
+                </button>
+                <button type="button" id="btn-konfirmasi-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:none; background:#dc2626; color:#ffffff;
+          transition:background 150ms ease;">
+                    Ya, Keluar
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <!-- ════════════════════════════════════════════════════════════ -->
+
+    <!-- CSS modal keluar -->
+    <style>
+        #modalKeluarOverlay.active {
+            opacity: 1 !important;
+            pointer-events: all !important;
+        }
+
+        #modalKeluarOverlay.active #modal-keluar-content {
+            transform: scale(1) translateY(0) !important;
+        }
+
+        #btn-batal-keluar:hover {
+            background: #f1f5f9 !important;
+        }
+
+        #btn-konfirmasi-keluar:hover {
+            background: #b91c1c !important;
+        }
+
+        /* Dark mode */
+        html.dark #modal-keluar-content {
+            background: #1e293b !important;
+        }
+
+        html.dark #modal-keluar-title {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark #modal-keluar-desc {
+            color: #94a3b8 !important;
+        }
+
+        html.dark #modal-keluar-footer {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark #btn-batal-keluar {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #94a3b8 !important;
+        }
+
+        html.dark #btn-batal-keluar:hover {
+            background: #3f546e !important;
+            color: #e2e8f0 !important;
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/api.js"></script>
+
+    <script>
+        // ── Auth & Layout Init ────────────────────────────
+        (function () {
+            const user = requireAuth();
+            if (!user) return;
+
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+            setEl('topbar-avatar', user.avatar || 'SW');
+            setEl('topbar-username', user.nama || 'Admin');
+            setEl('sb-avatar', user.avatar || 'SW');
+            setEl('sb-username', user.nama || 'Admin');
+            setEl('sb-role', user.role === 'admin' ? 'Administrator' : user.role === 'guru_bk' ? 'Guru BK' : 'Wali Kelas');
+
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            setEl('info-last-login', `Hari ini, ${h}:${m}`);
+        })();
+
+        initLayout('Profil Admin');
+
+        // ── Load profil dari API ──────────────────────────
+        let profileData = {};
+
+        async function loadProfileFromAPI() {
+            const res = await apiRequest('../api/profile.php', { method: 'GET' });
+            if (res && res.success && res.data) {
+                profileData = res.data;
+                renderProfile(profileData);
+            } else {
+                const user = JSON.parse(sessionStorage.getItem('sigap_user') || '{}');
+                renderProfile(user);
+            }
+        }
+
+        function renderProfile(data) {
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? '—'; };
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+
+            setEl('hero-name', data.nama);
+            setEl('hero-school', SIGAP_CONFIG?.namaSekolah || 'SMK Negeri 1 Surakarta');
+            setEl('hero-email', data.email || '—');
+            setEl('hero-wa', data.wa || '—');
+            if (data.nip) setEl('hero-nip', 'NIP: ' + data.nip);
+
+            const initials = (data.avatar && data.avatar.length <= 3)
+                ? data.avatar
+                : (data.nama || '?').split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+            ['avatar-initials', 'topbar-avatar', 'sb-avatar'].forEach(id => setEl(id, initials));
+            setEl('sb-username', data.nama);
+
+            setEl('info-username', data.username);
+
+            if (data.created_at) {
+                const tgl = new Date(data.created_at);
+                const bln = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                setEl('info-join-date', `${tgl.getDate()} ${bln[tgl.getMonth()]} ${tgl.getFullYear()}`);
+            }
+
+            // Statistik
+            setEl('stat-pelanggaran', data.total_input_pelanggaran ?? '—');
+            setEl('stat-siswa', data.total_siswa ?? '—');
+            setEl('stat-bulan', data.pelanggaran_bulan_ini ?? '—');
+            setEl('stat-wa', data.wa_terkirim ?? '—');
+
+            // Form fields
+            setVal('field-nama', data.nama);
+            setVal('field-email', data.email);
+            setVal('field-wa', data.wa);
+            setVal('field-nip', data.nip);
+            setVal('field-username', data.username);
+        }
+
+        // ── Tab switching ─────────────────────────────────
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+            const pane = document.getElementById(tabId);
+            if (pane) pane.classList.add('active');
+            document.querySelectorAll(`[data-tab="${tabId}"]`).forEach(t => t.classList.add('active'));
+            if (tabId === 'tab-activity') loadActivity();
+        }
+
+        // ── Avatar preview ────────────────────────────────
+        document.getElementById('avatar-input').addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.getElementById('avatar-img');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                document.getElementById('avatar-initials').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function togglePw(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.className = input.type === 'password' ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+        }
+
+        function checkPasswordStrength(val) {
+            const wrap = document.getElementById('pw-strength-wrap');
+            wrap.style.display = val.length > 0 ? 'block' : 'none';
+            const checks = { len: val.length >= 8, upper: /[A-Z]/.test(val), num: /[0-9]/.test(val), sym: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(val) };
+            const req = (id, ok) => { const el = document.getElementById('req-' + id); if (el) el.classList.toggle('ok', ok); };
+            req('len', checks.len); req('upper', checks.upper); req('num', checks.num); req('sym', checks.sym);
+            const score = Object.values(checks).filter(Boolean).length;
+            const fill = document.getElementById('pw-strength-fill');
+            const text = document.getElementById('pw-strength-text');
+            const levels = [{ pct: 0, color: 'var(--gray-300)', label: '—' }, { pct: 25, color: 'var(--danger)', label: 'Lemah' }, { pct: 50, color: 'var(--warning)', label: 'Sedang' }, { pct: 75, color: 'var(--info)', label: 'Kuat' }, { pct: 100, color: 'var(--success)', label: 'Sangat Kuat' }];
+            const lv = levels[score];
+            fill.style.width = lv.pct + '%'; fill.style.background = lv.color;
+            text.textContent = lv.label; text.style.color = lv.color;
+        }
+
+        function checkConfirm() {
+            const pw = document.getElementById('pw-new').value;
+            const cfm = document.getElementById('pw-confirm').value;
+            const msg = document.getElementById('pw-match-msg');
+            if (!cfm) { msg.textContent = ''; return; }
+            msg.textContent = pw === cfm ? '✓ Password cocok' : '✗ Password tidak cocok';
+            msg.style.color = pw === cfm ? 'var(--success)' : 'var(--danger)';
+        }
+
+        // ── Save profile → API ────────────────────────────
+        async function saveProfile() {
+            const nama = document.getElementById('field-nama').value.trim();
+            const email = document.getElementById('field-email').value.trim();
+            const wa = document.getElementById('field-wa').value.trim();
+            const username = document.getElementById('field-username').value.trim();
+            const nip = document.getElementById('field-nip').value.trim();
+            const sekolah = document.getElementById('field-sekolah').value.trim();
+
+            if (!nama || !username) {
+                showToast({ type: 'warning', title: 'Validasi Gagal', message: 'Nama dan username wajib diisi.' });
+                return;
+            }
+
+            const saveBtn = document.querySelector('[onclick="saveProfile()"]');
+            const origText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+            const res = await apiRequest('../api/profile.php', {
+                method: 'POST',
+                body: toFormData({ action: 'update_profile', nama, email, wa, username, nip, sekolah }),
+            });
+
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = origText;
+
+            if (res && res.success) {
+                const user = JSON.parse(sessionStorage.getItem('sigap_user') || '{}');
+                user.nama = nama; user.username = username;
+                if (res.data?.avatar) user.avatar = res.data.avatar;
+                sessionStorage.setItem('sigap_user', JSON.stringify(user));
+
+                document.getElementById('hero-name').textContent = nama;
+                if (email) document.getElementById('hero-email').textContent = email;
+                if (wa) document.getElementById('hero-wa').textContent = wa;
+                if (nip) document.getElementById('hero-nip').textContent = 'NIP: ' + nip;
+                if (sekolah) document.getElementById('hero-school').textContent = sekolah;
+                document.getElementById('info-username').textContent = username;
+
+                const initials = nama.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+                ['avatar-initials', 'topbar-avatar', 'sb-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = initials; });
+                document.getElementById('sb-username').textContent = nama;
+
+                showToast({ type: 'success', title: 'Profil Diperbarui', message: 'Data profil berhasil disimpan ke database.' });
+            } else {
+                showToast({ type: 'danger', title: 'Gagal Menyimpan', message: res?.message || 'Terjadi kesalahan. Coba lagi.' });
+            }
+        }
+
+        function resetProfileForm() {
+            renderProfile(profileData);
+            showToast({ type: 'info', title: 'Form Direset', message: 'Data dikembalikan ke kondisi awal.' });
+        }
+
+        // ── Save password → API ───────────────────────────
+        async function savePassword() {
+            const current = document.getElementById('pw-current').value;
+            const newPw = document.getElementById('pw-new').value;
+            const confirm = document.getElementById('pw-confirm').value;
+
+            if (!current || !newPw || !confirm) { showToast({ type: 'warning', title: 'Lengkapi Form', message: 'Semua field wajib diisi.' }); return; }
+            if (newPw !== confirm) { showToast({ type: 'danger', title: 'Password Tidak Cocok', message: 'Konfirmasi password tidak sesuai.' }); return; }
+            if (newPw.length < 8) { showToast({ type: 'warning', title: 'Password Terlalu Pendek', message: 'Password minimal 8 karakter.' }); return; }
+
+            const saveBtn = document.querySelector('[onclick="savePassword()"]');
+            const origText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+
+            const res = await apiRequest('../api/profile.php', {
+                method: 'POST',
+                body: toFormData({ action: 'change_password', current_password: current, new_password: newPw }),
+            });
+
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = origText;
+
+            if (res && res.success) {
+                showToast({ type: 'success', title: 'Password Diubah', message: 'Berhasil! Logout otomatis dalam 2 detik...' });
+                resetPasswordForm();
+                setTimeout(() => { sessionStorage.removeItem('sigap_user'); window.location.href = 'login.html'; }, 2000);
+            } else {
+                showToast({ type: 'danger', title: 'Gagal Mengubah Password', message: res?.message || 'Password saat ini mungkin salah.' });
+            }
+        }
+
+        function resetPasswordForm() {
+            ['pw-current', 'pw-new', 'pw-confirm'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            document.getElementById('pw-strength-wrap').style.display = 'none';
+            document.getElementById('pw-match-msg').textContent = '';
+            ['req-len', 'req-upper', 'req-num', 'req-sym'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('ok'); });
+        }
+
+        // ── Activity log ──────────────────────────────────
+        function loadActivity() {
+            const list = document.getElementById('activity-list');
+            const now = new Date();
+            const fmt = (d) => {
+                const h = String(d.getHours()).padStart(2, '0'), m = String(d.getMinutes()).padStart(2, '0');
+                const bln = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+                if (d.toDateString() === now.toDateString()) return `Hari ini ${h}:${m}`;
+                const yday = new Date(now); yday.setDate(yday.getDate() - 1);
+                if (d.toDateString() === yday.toDateString()) return `Kemarin ${h}:${m}`;
+                return `${d.getDate()} ${bln[d.getMonth()]}, ${h}:${m}`;
+            };
+            const t = (min) => { const d = new Date(now); d.setMinutes(d.getMinutes() - min); return fmt(d); };
+
+            const ACTIVITY = [
+                { type: 'login', icon: 'fa-right-to-bracket', title: 'Login ke sistem', desc: 'Browser Anda · Sesi aktif saat ini', time: t(0) },
+                { type: 'input', icon: 'fa-circle-plus', title: 'Input pelanggaran baru', desc: 'Siswa: Ahmad Fauzi — Terlambat (5 poin)', time: t(35) },
+                { type: 'input', icon: 'fa-circle-plus', title: 'Input pelanggaran baru', desc: 'Siswa: Budi Santoso — Seragam Tidak Rapi', time: t(90) },
+                { type: 'laporan', icon: 'fa-file-export', title: 'Export laporan', desc: 'Laporan bulan ini — rekap lengkap', time: t(1440) },
+                { type: 'edit', icon: 'fa-pen', title: 'Edit data siswa', desc: 'Update nomor HP orang tua siswa', time: t(1530) },
+                { type: 'login', icon: 'fa-right-to-bracket', title: 'Login ke sistem', desc: 'Login sesi sebelumnya', time: t(2880) },
+            ];
+
+            setTimeout(() => {
+                list.innerHTML = ACTIVITY.map(a => `
+                    <div class="activity-item">
+                      <div class="activity-dot-wrap"><div class="activity-dot ${a.type}"><i class="fa-solid ${a.icon}"></i></div></div>
+                      <div class="activity-content"><div class="activity-title">${a.title}</div><div class="activity-desc">${a.desc}</div></div>
+                      <div class="activity-time">${a.time}</div>
+                    </div>
+                `).join('');
+            }, 400);
+        }
+
+        document.querySelectorAll('.btn-revoke').forEach(btn => {
+            btn.addEventListener('click', function () {
+                if (confirm('Cabut sesi perangkat ini?')) {
+                    this.closest('.session-item').style.opacity = '0.4';
+                    this.textContent = 'Dicabut'; this.disabled = true;
+                    showToast({ type: 'success', title: 'Sesi Dicabut', message: 'Perangkat tersebut telah dikeluarkan.' });
+                }
+            });
+        });
+
+        function confirmLogoutAll() {
+            if (confirm('Anda yakin ingin logout dari SEMUA perangkat?\nAnda akan diarahkan ke halaman login.')) {
+                apiRequest('../api/auth.php', { method: 'POST', body: toFormData({ action: 'logout' }) })
+                    .finally(() => { sessionStorage.removeItem('sigap_user'); window.location.href = 'login.html'; });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initModals();
+            loadProfileFromAPI();
+        });
+
+        // ── Dark Mode ─────────────────────────────────────────────
+        (function () {
+            const html = document.documentElement;
+            const STORAGE = 'sigap_darkmode';
+
+            if (localStorage.getItem(STORAGE) === '1') {
+                html.classList.add('dark');
+            }
+
+            function setDark(on) {
+                html.classList.add('dark-transitioning');
+                setTimeout(() => html.classList.remove('dark-transitioning'), 300);
+                if (on) {
+                    html.classList.add('dark');
+                    localStorage.setItem(STORAGE, '1');
+                } else {
+                    html.classList.remove('dark');
+                    localStorage.setItem(STORAGE, '0');
+                }
+                updateIcon();
+            }
+
+            function updateIcon() {
+                const isDark = html.classList.contains('dark');
+                const icon = document.getElementById('dm-icon');
+                const btn = document.getElementById('btn-darkmode');
+                if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+                if (btn) btn.title = isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap';
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                updateIcon();
+                const btn = document.getElementById('btn-darkmode');
+                if (btn) btn.addEventListener('click', function () {
+                    setDark(!html.classList.contains('dark'));
+                });
+            });
+        })();
+
+        // ── Logout confirmation — Custom Modal Overlay ────────────
+        (function () {
+            const overlay = document.getElementById('modalKeluarOverlay');
+            const btnOk = document.getElementById('btn-konfirmasi-keluar');
+            const btnBatal = document.getElementById('btn-batal-keluar');
+
+            function openModal() {
+                overlay.classList.add('active');
+            }
+
+            function closeModal() {
+                overlay.classList.remove('active');
+                btnOk.disabled = false;
+                btnOk.textContent = 'Ya, Keluar';
+            }
+
+            // Intercept setiap tombol [data-logout]
+            document.querySelectorAll('[data-logout]').forEach(function (el) {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    openModal();
+                }, true);
+            });
+
+            // Klik backdrop → tutup
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) closeModal();
+            });
+
+            // Tombol Batal
+            btnBatal.addEventListener('click', closeModal);
+
+            // Tombol Ya, Keluar → logout
+            btnOk.addEventListener('click', function () {
+                btnOk.disabled = true;
+                btnOk.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-1"></i> Keluar…';
+                setTimeout(function () {
+                    closeModal();
+                    // Bersihkan session
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    // Panggil fungsi logout api.js jika ada (tanpa mengandalkan redirect-nya)
+                    if (typeof logout === 'function') {
+                        try { logout(); } catch (e) { }
+                    }
+                    // Paksa redirect ke halaman login
+                    window.location.href = 'login.html';
+                }, 500);
+            });
+
+            // ESC → tutup
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+            });
+        })();
+    </script>
+</body>
+
+</html>

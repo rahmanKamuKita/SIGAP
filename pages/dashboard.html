@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Dashboard — SIGAP</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" />
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="../assets/images/logo-sekolah.png">
+
+  <style>
+    /* ── Dashboard-specific overrides ───────────────────── */
+
+    /* Metric card entry animation */
+    .metric-card {
+      animation: cardIn 0.5s ease both;
+    }
+
+    .metric-card:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .metric-card:nth-child(2) {
+      animation-delay: 0.10s;
+    }
+
+    .metric-card:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .metric-card:nth-child(4) {
+      animation-delay: 0.20s;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Metric value counter animation */
+    .metric-value {
+      transition: all 0.4s ease;
+    }
+
+    /* Chart cards */
+    .chart-card {
+      animation: cardIn 0.5s 0.25s ease both;
+    }
+
+    /* Recent table card */
+    .recent-card {
+      animation: cardIn 0.5s 0.35s ease both;
+    }
+
+    /* Topbar date badge */
+    .topbar-date {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--gray-500);
+      padding: 6px 12px;
+      background: var(--gray-100);
+      border-radius: var(--radius-full);
+    }
+
+    .topbar-date i {
+      font-size: 11px;
+      color: var(--primary);
+    }
+
+    /* Quick action bar */
+    .quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .quick-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+    }
+
+    .quick-action-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-xlight);
+    }
+
+    .quick-action-btn.primary-qa {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(26, 79, 160, 0.3);
+    }
+
+    .quick-action-btn.primary-qa:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(26, 79, 160, 0.4);
+    }
+
+    .quick-action-btn i {
+      font-size: 12px;
+    }
+
+    /* Section heading */
+    .section-heading {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--gray-400);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    /* Chart wrapper sizing */
+    .chart-wrap-bar {
+      height: 240px;
+      position: relative;
+    }
+
+    .chart-wrap-pie {
+      height: 220px;
+      position: relative;
+    }
+
+    /* Chart legend custom */
+    .chart-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chart-legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+    }
+
+    .chart-legend-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gray-600);
+    }
+
+    .chart-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .chart-legend-count {
+      font-weight: 700;
+      color: var(--gray-800);
+      font-size: 13px;
+    }
+
+    /* Status summary row */
+    .status-summary {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .status-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      border-radius: var(--radius-md);
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      gap: 4px;
+    }
+
+    .status-item .status-num {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .status-item .status-lbl {
+      font-size: 11px;
+      color: var(--gray-500);
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .status-item.terkirim .status-num {
+      color: var(--success);
+    }
+
+    .status-item.pending .status-num {
+      color: var(--warning);
+    }
+
+    .status-item.gagal .status-num {
+      color: var(--danger);
+    }
+
+    /* Recent table student col */
+    .student-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .student-cell .s-name {
+      font-weight: 600;
+      color: var(--gray-900);
+      font-size: 13.5px;
+    }
+
+    .student-cell .s-nis {
+      font-size: 11px;
+      color: var(--gray-400);
+      font-family: var(--font-mono);
+    }
+
+    /* "Lihat semua" link */
+    .see-all-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: none;
+      padding: 3px 0;
+      border-bottom: 1px dashed transparent;
+      transition: border-color var(--transition-fast);
+    }
+
+    .see-all-link:hover {
+      border-color: var(--primary);
+    }
+
+    /* Info panel (pengumuman/tips) */
+    .info-panel {
+      background: linear-gradient(135deg, var(--primary-xlight), #f0fdf4);
+      border: 1px solid var(--gray-200);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      animation: cardIn 0.5s 0.0s ease both;
+    }
+
+    .info-panel i {
+      color: var(--primary);
+      font-size: 16px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .info-panel-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 2px;
+    }
+
+    .info-panel-text span {
+      font-size: 12.5px;
+      color: var(--gray-600);
+    }
+
+    .info-panel-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 2px 4px;
+      flex-shrink: 0;
+    }
+
+    .info-panel-close:hover {
+      color: var(--gray-700);
+    }
+
+    /* Trend badge on metric */
+    .metric-trend {
+      margin-top: 4px;
+      font-size: 11.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .metric-trend.up {
+      color: var(--danger);
+    }
+
+    .metric-trend.down {
+      color: var(--success);
+    }
+
+    .metric-trend.flat {
+      color: var(--gray-400);
+    }
+
+    /* Responsive chart grid */
+    @media (max-width: 900px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar nav text */
+    .sidebar-nav a span {
+      white-space: nowrap;
+    }
+
+    /* Print: hide charts gracefully */
+    @media print {
+      canvas {
+        max-width: 100%;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════
+       DARK MODE — DASHBOARD
+    ════════════════════════════════════════════════════════ */
+
+    :root {
+      --dm-bg: #0f172a;
+      --dm-surface: #1e293b;
+      --dm-surface-2: #253348;
+      --dm-surface-3: #2d3f55;
+      --dm-border: #2e3f55;
+      --dm-border-strong: #3d5068;
+      --dm-text: #e2e8f0;
+      --dm-text-2: #94a3b8;
+      --dm-text-3: #64748b;
+      --dm-accent: #3b82f6;
+      --dm-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+      --dm-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --dm-sidebar: #0d1829;
+      --dm-topbar: rgba(13, 24, 41, 0.95);
+    }
+
+    html.dark-transitioning *,
+    html.dark-transitioning *::before,
+    html.dark-transitioning *::after {
+      transition:
+        background-color 0.22s ease,
+        border-color 0.22s ease,
+        color 0.18s ease,
+        box-shadow 0.22s ease !important;
+    }
+
+    /* ── Body ─────────────────────────────────────────────── */
+    html.dark body {
+      background: var(--dm-bg) !important;
+      background-image: none !important;
+      color: var(--dm-text) !important;
+    }
+
+    /* ── Sidebar ──────────────────────────────────────────── */
+    html.dark .sidebar {
+      background: var(--dm-sidebar) !important;
+      border-right: 1px solid var(--dm-border) !important;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    html.dark .sidebar-brand {
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-brand-logo {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html.dark .sidebar-brand-text strong {
+      color: #fff !important;
+    }
+
+    html.dark .sidebar-brand-text small {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+
+    html.dark .sidebar-nav a {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .sidebar-nav a.active {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #60a5fa !important;
+    }
+
+    html.dark .sidebar-nav a.active::before {
+      background: #60a5fa !important;
+    }
+
+    html.dark .sidebar-section-label {
+      color: rgba(100, 116, 139, 0.7) !important;
+    }
+
+    html.dark .sidebar-divider {
+      border-color: var(--dm-border) !important;
+      background: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-footer {
+      border-top-color: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-user-info strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .sidebar-user-info span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .sidebar-user-arrow {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .sidebar-user-link:hover {
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* ── Topbar ───────────────────────────────────────────── */
+    html.dark .topbar {
+      background: var(--dm-topbar) !important;
+      border-bottom-color: var(--dm-border) !important;
+      box-shadow: 0 1px 0 var(--dm-border), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+      backdrop-filter: blur(20px) !important;
+    }
+
+    html.dark .topbar-page-title {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .topbar-breadcrumb {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .topbar-hamburger {
+      color: var(--dm-text-2) !important;
+      background: transparent !important;
+    }
+
+    html.dark .topbar-hamburger:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .topbar-user {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .topbar-user:hover {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-accent) !important;
+      box-shadow: 0 2px 12px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    html.dark .topbar-user-name {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .btn-logout {
+      background: rgba(220, 38, 38, 0.12) !important;
+      border-color: rgba(220, 38, 38, 0.3) !important;
+      color: #f87171 !important;
+    }
+
+    html.dark .btn-logout:hover {
+      background: rgba(220, 38, 38, 0.22) !important;
+      border-color: #f87171 !important;
+    }
+
+    html.dark .topbar-date {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: var(--dm-text-2) !important;
+      border: 1px solid var(--dm-border) !important;
+    }
+
+    html.dark .topbar-date i {
+      color: #60a5fa !important;
+    }
+
+    /* ── Dark mode toggle button ──────────────────────────── */
+    .btn-darkmode {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-darkmode:hover {
+      border-color: #1a4fa0;
+      color: #1a4fa0;
+      background: #eff6ff;
+    }
+
+    html.dark .btn-darkmode {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: var(--dm-border) !important;
+      color: #fbbf24 !important;
+    }
+
+    html.dark .btn-darkmode:hover {
+      background: rgba(251, 191, 36, 0.12) !important;
+      border-color: #fbbf24 !important;
+      color: #fcd34d !important;
+    }
+
+    /* ── Page header ──────────────────────────────────────── */
+    html.dark .page-header h2 {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .page-header h2 i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .page-header p,
+    html.dark .page-subtitle {
+      color: var(--dm-text-2) !important;
+    }
+
+    /* ── Info panel ───────────────────────────────────────── */
+    html.dark .info-panel {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(22, 163, 74, 0.08)) !important;
+      border-color: var(--dm-border) !important;
+      border-left-color: var(--dm-accent) !important;
+    }
+
+    html.dark .info-panel i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .info-panel-text strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .info-panel-text span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .info-panel-close {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .info-panel-close:hover {
+      color: var(--dm-text) !important;
+    }
+
+    /* ── Section heading ──────────────────────────────────── */
+    html.dark .section-heading {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .section-heading::after {
+      background: var(--dm-border) !important;
+    }
+
+    /* ── Quick actions ────────────────────────────────────── */
+    html.dark .quick-action-btn {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .quick-action-btn:hover {
+      border-color: var(--dm-accent) !important;
+      color: #60a5fa !important;
+      background: rgba(59, 130, 246, 0.1) !important;
+    }
+
+    html.dark .quick-action-btn.primary-qa {
+      background: var(--dm-accent) !important;
+      border-color: var(--dm-accent) !important;
+      color: #fff !important;
+    }
+
+    html.dark .quick-action-btn.primary-qa:hover {
+      background: #2563eb !important;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35) !important;
+    }
+
+    /* ── Cards ────────────────────────────────────────────── */
+    html.dark .card {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+      box-shadow: var(--dm-shadow-sm) !important;
+    }
+
+    html.dark .card-header {
+      background: var(--dm-surface-2) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .card-title {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .card-title i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .card-body {
+      background: var(--dm-surface) !important;
+    }
+
+    html.dark .card-footer {
+      background: var(--dm-surface) !important;
+      border-top-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .card-footer strong {
+      color: var(--dm-text) !important;
+    }
+
+    /* ── Metric cards ─────────────────────────────────────── */
+    html.dark .metric-card {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+      box-shadow: var(--dm-shadow-sm) !important;
+    }
+
+    html.dark .metric-value {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .metric-label {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .metric-card.blue .metric-icon {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #60a5fa !important;
+    }
+
+    html.dark .metric-card.red .metric-icon {
+      background: rgba(220, 38, 38, 0.15) !important;
+      color: #f87171 !important;
+    }
+
+    html.dark .metric-card.orange .metric-icon {
+      background: rgba(217, 119, 6, 0.15) !important;
+      color: #fbbf24 !important;
+    }
+
+    html.dark .metric-card.green .metric-icon {
+      background: rgba(22, 163, 74, 0.15) !important;
+      color: #4ade80 !important;
+    }
+
+    html.dark .metric-trend.flat {
+      color: var(--dm-text-3) !important;
+    }
+
+    /* ── Status summary ───────────────────────────────────── */
+    html.dark .status-item {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .status-item .status-lbl {
+      color: var(--dm-text-2) !important;
+    }
+
+    /* ── Chart legend (if used) ───────────────────────────── */
+    html.dark .chart-legend-left {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .chart-legend-count {
+      color: var(--dm-text) !important;
+    }
+
+    /* ── "Lihat semua" link ───────────────────────────────── */
+    html.dark .see-all-link {
+      color: #60a5fa !important;
+    }
+
+    html.dark .see-all-link:hover {
+      border-color: #60a5fa !important;
+    }
+
+    /* ── Recent table / student cell ──────────────────────── */
+    html.dark .student-cell .s-name {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .student-cell .s-nis {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .data-table th {
+      background: var(--dm-surface-2) !important;
+      color: var(--dm-text-2) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .data-table td {
+      color: var(--dm-text) !important;
+      border-bottom-color: var(--dm-border) !important;
+      background: transparent !important;
+    }
+
+    html.dark .data-table tbody tr {
+      background: var(--dm-surface) !important;
+    }
+
+    html.dark .data-table tr:hover td {
+      background: var(--dm-surface-2) !important;
+    }
+
+    html.dark .data-table tr:last-child td {
+      border-bottom: none !important;
+    }
+
+    html.dark .table-wrapper {
+      background: var(--dm-surface) !important;
+    }
+
+    /* ── Action button (Detail on recent table) ───────────── */
+    html.dark .btn-action-view,
+    html.dark .btn-action-edit,
+    html.dark .btn-action-detail {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .btn-action-view:hover,
+    html.dark .btn-action-detail:hover {
+      border-color: #22d3ee !important;
+      color: #22d3ee !important;
+      background: rgba(8, 145, 178, 0.1) !important;
+    }
+
+    html.dark .btn.btn-outline {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .btn.btn-outline:hover {
+      border-color: var(--dm-accent) !important;
+      color: #60a5fa !important;
+    }
+
+    /* ── Badges ───────────────────────────────────────────── */
+    html.dark .badge-primary {
+      background: rgba(59, 130, 246, 0.18) !important;
+      color: #93c5fd !important;
+    }
+
+    html.dark .badge-success {
+      background: rgba(34, 197, 94, 0.15) !important;
+      color: #4ade80 !important;
+    }
+
+    html.dark .badge-warning {
+      background: rgba(234, 179, 8, 0.15) !important;
+      color: #fbbf24 !important;
+    }
+
+    html.dark .badge-danger {
+      background: rgba(239, 68, 68, 0.15) !important;
+      color: #f87171 !important;
+    }
+
+    /* ── Scrollbar ────────────────────────────────────────── */
+    html.dark ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    html.dark ::-webkit-scrollbar-track {
+      background: var(--dm-bg);
+    }
+
+    html.dark ::-webkit-scrollbar-thumb {
+      background: var(--dm-border-strong);
+      border-radius: 999px;
+    }
+
+    html.dark ::-webkit-scrollbar-thumb:hover {
+      background: #4a6080;
+    }
+
+    /* ── Empty state ──────────────────────────────────────── */
+    html.dark .empty-state h4 {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .empty-state p {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .empty-state i {
+      color: var(--dm-text-3) !important;
+    }
+
+    /* ── Text helpers ──────────────────────────────────────── */
+    html.dark .text-muted {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark small {
+      color: var(--dm-text-3) !important;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       RESPONSIVE — DASHBOARD MOBILE
+    ════════════════════════════════════════════════════════ */
+
+    @media (max-width: 768px) {
+
+      /* ── Topbar ───────────────────────────────────────── */
+      .topbar {
+        padding: 0 14px;
+        gap: 10px;
+      }
+
+      .topbar-left {
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .topbar-page-title {
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+      }
+
+      .topbar-right {
+        gap: 8px;
+      }
+
+      .topbar-date {
+        padding: 5px 10px;
+        font-size: 11.5px;
+      }
+
+      .topbar-user {
+        padding: 5px 8px;
+      }
+
+      .btn-logout {
+        padding: 7px 10px;
+      }
+
+      /* ── Page header & quick actions ─────────────────────── */
+      .quick-actions {
+        width: 100%;
+      }
+
+      .quick-action-btn {
+        flex: 1;
+        justify-content: center;
+        white-space: nowrap;
+      }
+
+      /* ── Metric cards (2-col range) ──────────────────────── */
+      .metric-card {
+        padding: 14px;
+        gap: 12px;
+      }
+
+      .metric-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+      }
+
+      .metric-value {
+        font-size: 19px;
+      }
+
+      .metric-label {
+        font-size: 11px;
+        white-space: normal;
+      }
+
+      .metric-trend {
+        font-size: 10.5px;
+      }
+
+      /* ── Chart heights ────────────────────────────────────── */
+      .chart-wrap-bar {
+        height: 200px;
+      }
+
+      .chart-wrap-pie {
+        height: 190px;
+      }
+
+      /* ── Status summary ──────────────────────────────────── */
+      .status-summary {
+        gap: 8px;
+      }
+
+      .status-item {
+        padding: 10px 6px;
+      }
+
+      .status-item .status-num {
+        font-size: 18px;
+      }
+
+      .status-item .status-lbl {
+        font-size: 10px;
+      }
+
+      /* ── Cards & charts (avoid header overflow) ──────────── */
+      .card-header {
+        flex-wrap: wrap;
+        row-gap: 6px;
+      }
+
+      canvas {
+        max-width: 100%;
+      }
+
+      .chart-card .card-body {
+        padding: 14px 10px;
+      }
+
+      /* ── Recent table footer ─────────────────────────────── */
+      .card-footer {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+      }
+
+      .card-footer .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      /* ── Info panel ───────────────────────────────────────── */
+      .info-panel {
+        padding: 12px;
+      }
+
+      .info-panel-text strong {
+        font-size: 12.5px;
+      }
+
+      .info-panel-text span {
+        font-size: 11.5px;
+      }
+    }
+
+    /* ── Recent table → stacked cards on narrow screens ───────── */
+    @media (max-width: 640px) {
+      .table-wrapper {
+        overflow-x: visible;
+        padding: 12px;
+      }
+
+      #recent-table thead {
+        display: none;
+      }
+
+      #recent-table,
+      #recent-table tbody,
+      #recent-table tr,
+      #recent-table td {
+        display: block;
+        width: 100%;
+      }
+
+      #recent-table tbody tr {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        margin: 0 0 12px;
+        padding: 2px 14px;
+      }
+
+      #recent-table tbody tr:last-child {
+        margin-bottom: 0;
+      }
+
+      #recent-table td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--gray-100);
+        text-align: right;
+      }
+
+      #recent-table td:last-child {
+        border-bottom: none;
+      }
+
+      #recent-table td::before {
+        content: attr(data-label);
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--gray-400);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        text-align: left;
+        flex-shrink: 0;
+      }
+
+      #recent-table td[data-label="No"] {
+        display: none;
+      }
+
+      #recent-table .student-cell {
+        align-items: flex-end;
+      }
+
+      #recent-table td[colspan] {
+        display: block;
+        text-align: center;
+      }
+
+      #recent-table td[colspan]::before {
+        content: none;
+      }
+
+      html.dark #recent-table tbody tr {
+        background: var(--dm-surface) !important;
+        border-color: var(--dm-border) !important;
+      }
+
+      html.dark #recent-table td {
+        border-bottom-color: var(--dm-border) !important;
+      }
+
+      html.dark #recent-table td::before {
+        color: var(--dm-text-3) !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+
+      /* ── Topbar: keep only the essentials ────────────────── */
+      .topbar {
+        padding: 0 10px;
+      }
+
+      .topbar-breadcrumb {
+        display: none;
+      }
+
+      .topbar-date {
+        display: none;
+      }
+
+      .btn-logout-text {
+        display: none;
+      }
+
+      .btn-logout {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+      }
+
+      .topbar-user {
+        padding: 0;
+        border: none;
+        background: none;
+      }
+
+      /* ── Quick actions stack ─────────────────────────────── */
+      .quick-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      /* ── Metric cards: single column, compact ────────────── */
+      .metric-card {
+        padding: 16px;
+      }
+
+      .metric-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+
+      .metric-value {
+        font-size: 22px;
+      }
+
+      .metric-label {
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      /* ── Status summary: allow wrap on very small screens ── */
+      .status-summary {
+        flex-wrap: wrap;
+      }
+
+      .status-item {
+        flex: 1 1 30%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+
+    <!-- ═══════════════════════════════════════════════════
+       SIDEBAR OVERLAY (mobile)
+  ════════════════════════════════════════════════════ -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- ═══════════════════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+      <!-- Brand -->
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo">
+          <img src="../assets/images/logo-sekolah.png" alt="Logo SMK Negeri 1 Masbagik"
+            style="width:30px; height:30px; object-fit:contain;">
+        </div>
+        <div class="sidebar-brand-text">
+          <strong>SIGAP</strong>
+          <small id="sb-school">SMKN 1 Masbagik</small>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Menu Utama</div>
+
+        <a href="dashboard.html">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="data-siswa.html">
+          <i class="fa-solid fa-users"></i>
+          <span>Data Siswa</span>
+        </a>
+        <a href="input-pelanggaran.html">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>Input Pelanggaran</span>
+        </a>
+        <a href="riwayat.html">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Riwayat</span>
+        </a>
+        <a href="laporan.html">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Laporan</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-label">Akun</div>
+
+        <a href="profile.html">
+          <i class="fa-solid fa-user-circle"></i>
+          <span>Profil Saya</span>
+        </a>
+        <a href="#" data-logout>
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Keluar</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-user-avatar" id="sb-avatar">SW</div>
+          <div class="sidebar-user-info">
+            <strong id="sb-username">Sri Wahyuni</strong>
+            <span id="sb-role">Guru BK</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════════
+       TOPBAR
+  ════════════════════════════════════════════════════ -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-hamburger" id="hamburger-btn" aria-label="Toggle menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+          <div class="topbar-page-title" id="topbar-title">Dashboard</div>
+          <div class="topbar-breadcrumb">
+            <i class="fa-solid fa-house sep" style="font-size:9px"></i>
+            <span>Beranda</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="date-display">—</span>
+        </div>
+        <!-- Dark Mode Toggle -->
+        <button class="btn-darkmode" id="btn-darkmode" title="Ganti tema gelap/terang" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon" id="dm-icon"></i>
+        </button>
+        <a href="profile.html" class="topbar-user" title="Lihat Profil" style="text-decoration:none; cursor:pointer;">
+          <div class="topbar-avatar" id="topbar-avatar">SW</div>
+          <span class="topbar-user-name" id="topbar-username">Sri Wahyuni</span>
+        </a>
+        <button class="btn-logout" data-logout>
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span class="btn-logout-text">Keluar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════════════ -->
+    <main class="main-content">
+
+      <!-- Info panel -->
+      <div class="info-panel" id="info-panel">
+        <i class="fa-solid fa-circle-info"></i>
+        <div class="info-panel-text">
+          <strong>Tahun Ajaran 2025/2026 — Semester Genap</strong>
+          <span>Data yang ditampilkan merupakan rekap pelanggaran bulan April 2026. Klik "Input Pelanggaran" untuk
+            menambah data baru.</span>
+        </div>
+        <button class="info-panel-close" id="close-info" title="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h2><i class="fa-solid fa-gauge-high"></i> Dashboard</h2>
+          <p class="page-subtitle">Ringkasan aktivitas dan statistik pelanggaran siswa</p>
+        </div>
+        <div class="quick-actions">
+          <a href="input-pelanggaran.html" class="quick-action-btn primary-qa">
+            <i class="fa-solid fa-plus"></i> Input Pelanggaran
+          </a>
+          <a href="laporan.html" class="quick-action-btn">
+            <i class="fa-solid fa-file-export"></i> Ekspor Laporan
+          </a>
+        </div>
+      </div>
+
+      <!-- ── Metric Cards ────────────────────────────────── -->
+      <div class="section-heading">Statistik Umum</div>
+      <div class="metrics-grid" id="metrics-grid">
+
+        <!-- Total Siswa -->
+        <div class="metric-card blue">
+          <div class="metric-icon">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div class="metric-info">
+            <div class="metric-value" id="m-total-siswa">0</div>
+            <div class="metric-label">Total Siswa</div>
+            <div class="metric-trend flat">
+              <i class="fa-solid fa-minus" style="font-size:9px"></i>
+              Seluruh angkatan
+            </div>
+          </div>
+        </div>
+
+        <!-- Pelanggaran Bulan Ini -->
+        <div class="metric-card red">
+          <div class="metric-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div class="metric-info">
+            <div class="metric-value" id="m-pelanggaran">0</div>
+            <div class="metric-label">Pelanggaran Bulan Ini</div>
+            <div class="metric-trend up" id="trend-pelanggaran">
+              <i class="fa-solid fa-arrow-trend-up" style="font-size:9px"></i>
+              <span id="bulan-label">Bulan ini</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Belum Dilaporkan -->
+        <div class="metric-card orange">
+          <div class="metric-icon">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div class="metric-info">
+            <div class="metric-value" id="m-pending">0</div>
+            <div class="metric-label">Belum Dilaporkan (WA)</div>
+            <div class="metric-trend up" id="trend-pending">
+              <i class="fa-solid fa-circle-dot" style="font-size:9px"></i>
+              Status pending
+            </div>
+          </div>
+        </div>
+
+        <!-- WA Terkirim -->
+        <div class="metric-card green">
+          <div class="metric-icon">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <div class="metric-info">
+            <div class="metric-value" id="m-wa-sent">0</div>
+            <div class="metric-label">WA Terkirim</div>
+            <div class="metric-trend down" id="trend-wa">
+              <i class="fa-solid fa-check-double" style="font-size:9px"></i>
+              Notifikasi sukses
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /metrics-grid -->
+
+      <!-- ── Charts ─────────────────────────────────────── -->
+      <div class="section-heading">Grafik & Analisis</div>
+      <div class="charts-grid mb-4">
+
+        <!-- Bar Chart: Top Pelanggaran -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-chart-bar"></i>
+              Top Jenis Pelanggaran Bulan Ini
+            </div>
+            <span class="badge badge-primary">
+              <i class="fa-solid fa-calendar-days"></i>
+              April 2026
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap-bar">
+              <canvas id="chart-bar"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: pie + status summary -->
+        <div style="display:flex; flex-direction:column; gap:16px;">
+
+          <!-- Pie chart: Kelas -->
+          <div class="card chart-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-chart-pie"></i>
+                Pelanggaran per Kelas
+              </div>
+            </div>
+            <div class="card-body" style="padding-bottom:12px">
+              <div class="chart-wrap-pie">
+                <canvas id="chart-pie"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- WA Status summary card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-brands fa-whatsapp" style="color:var(--success)"></i>
+                Status Notifikasi WA
+              </div>
+            </div>
+            <div class="card-body" style="padding-top:12px">
+              <div class="status-summary">
+                <div class="status-item terkirim">
+                  <span class="status-num" id="ws-terkirim">—</span>
+                  <span class="status-lbl"><i class="fa-solid fa-check-double" style="font-size:10px"></i>
+                    Terkirim</span>
+                </div>
+                <div class="status-item pending">
+                  <span class="status-num" id="ws-pending">—</span>
+                  <span class="status-lbl"><i class="fa-solid fa-clock" style="font-size:10px"></i> Pending</span>
+                </div>
+                <div class="status-item gagal">
+                  <span class="status-num" id="ws-gagal">—</span>
+                  <span class="status-lbl"><i class="fa-solid fa-xmark" style="font-size:10px"></i> Gagal</span>
+                </div>
+              </div>
+
+              <!-- Legend bar -->
+              <div style="margin-top:14px;">
+                <div id="wa-legend-bar"
+                  style="height:8px; border-radius:100px; overflow:hidden; display:flex; gap:2px;"></div>
+                <div
+                  style="display:flex; justify-content:space-between; margin-top:6px; font-size:11px; color:var(--gray-400);">
+                  <span>Total notifikasi: <strong id="ws-total" style="color:var(--gray-700)">—</strong></span>
+                  <span>Sukses: <strong id="ws-rate" style="color:var(--success)">—%</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /charts-grid -->
+
+      <!-- ── Recent Violations Table ────────────────────── -->
+      <div class="section-heading">Pelanggaran Terbaru</div>
+      <div class="card recent-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            5 Pelanggaran Terakhir
+          </div>
+          <a href="riwayat.html" class="see-all-link">
+            Lihat semua <i class="fa-solid fa-arrow-right" style="font-size:10px"></i>
+          </a>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" id="recent-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Siswa</th>
+                <th>Kelas</th>
+                <th>Jenis Pelanggaran</th>
+                <th>Tanggal</th>
+                <th>Poin</th>
+                <th>Status WA</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody">
+              <!-- Diisi JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-footer" style="display:flex; align-items:center; justify-content:space-between;">
+          <span style="font-size:12.5px; color:var(--gray-500);">
+            Menampilkan 5 terbaru dari <strong id="total-records">0</strong> total pelanggaran
+          </span>
+          <a href="riwayat.html" class="btn btn-sm btn-outline">
+            <i class="fa-solid fa-list"></i> Riwayat Lengkap
+          </a>
+        </div>
+      </div>
+
+    </main><!-- /main-content -->
+  </div><!-- /app-wrapper -->
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ═══ MODAL KONFIRMASI KELUAR ════════════════════════════════ -->
+  <div id="modalKeluarOverlay" style="
+    position:fixed; inset:0;
+    background:rgba(15,23,42,0.65);
+    z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+    backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none;
+    transition:opacity 250ms cubic-bezier(0.4,0,0.2,1);">
+
+    <div id="modal-keluar-content" style="
+      background:#ffffff;
+      border-radius:24px;
+      width:100%; max-width:360px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25), 0 8px 16px rgba(0,0,0,0.1);
+      text-align:center;
+      transform:scale(0.95) translateY(16px);
+      transition:transform 250ms cubic-bezier(0.4,0,0.2,1);
+      overflow:hidden;">
+
+      <!-- Body -->
+      <div style="padding:36px 28px 24px;">
+        <!-- Ikon bulat -->
+        <div style="
+          width:80px; height:80px; border-radius:50%;
+          background:#dc2626;
+          display:flex; align-items:center; justify-content:center;
+          margin:0 auto 20px;
+          box-shadow:0 8px 24px rgba(220,38,38,0.35);">
+          <i class="fa-solid fa-right-from-bracket" style="color:#fff;font-size:28px;"></i>
+        </div>
+
+        <!-- Judul -->
+        <h5 id="modal-keluar-title" style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">
+          Konfirmasi Keluar
+        </h5>
+
+        <!-- Pesan -->
+        <p id="modal-keluar-desc" style="font-size:14px;color:#64748b;margin:0;line-height:1.6;">
+          Apakah Anda yakin ingin keluar dari aplikasi SIGAP?
+        </p>
+      </div>
+
+      <!-- Footer tombol -->
+      <div id="modal-keluar-footer" style="
+        display:flex; gap:10px;
+        padding:16px 24px;
+        border-top:1px solid #f1f5f9;
+        background:#f8fafc;">
+        <button type="button" id="btn-batal-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:1.5px solid #e2e8f0; background:#ffffff; color:#475569;
+          transition:background 150ms ease;">
+          Batal
+        </button>
+        <button type="button" id="btn-konfirmasi-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:none; background:#dc2626; color:#ffffff;
+          transition:background 150ms ease;">
+          Ya, Keluar
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- ════════════════════════════════════════════════════════════ -->
+
+  <!-- CSS modal keluar -->
+  <style>
+    #modalKeluarOverlay.active {
+      opacity: 1 !important;
+      pointer-events: all !important;
+    }
+
+    #modalKeluarOverlay.active #modal-keluar-content {
+      transform: scale(1) translateY(0) !important;
+    }
+
+    #btn-batal-keluar:hover {
+      background: #f1f5f9 !important;
+    }
+
+    #btn-konfirmasi-keluar:hover {
+      background: #b91c1c !important;
+    }
+
+    /* Dark mode */
+    html.dark #modal-keluar-content {
+      background: #1e293b !important;
+    }
+
+    html.dark #modal-keluar-title {
+      color: #f1f5f9 !important;
+    }
+
+    html.dark #modal-keluar-desc {
+      color: #94a3b8 !important;
+    }
+
+    html.dark #modal-keluar-footer {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    html.dark #btn-batal-keluar {
+      background: #334155 !important;
+      border-color: #475569 !important;
+      color: #94a3b8 !important;
+    }
+
+    html.dark #btn-batal-keluar:hover {
+      background: #3f546e !important;
+      color: #e2e8f0 !important;
+    }
+  </style>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script>
+    /* ============================================================
+       DASHBOARD.JS
+       ============================================================ */
+
+    // ── Auth guard ────────────────────────────────────────────
+    const currentUser = requireAuth();
+
+    // ── Init layout ───────────────────────────────────────────
+    initLayout('Dashboard');
+
+    // Fill sidebar user info
+    (function () {
+      const u = currentUser;
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      const roleLabelMap = { admin: 'Administrator', guru_bk: 'Guru BK', wali_kelas: 'Wali Kelas' };
+      const initials = u.avatar || (u.nama ? u.nama.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?');
+      setEl('sb-username', u.nama);
+      setEl('sb-role', roleLabelMap[u.role] || u.role);
+      setEl('sb-avatar', initials);
+      setEl('topbar-avatar', initials);
+      setEl('topbar-username', u.nama);
+    })();
+
+    // ── Date display ──────────────────────────────────────────
+    (function () {
+      const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const now = new Date();
+      const str = `${HARI[now.getDay()]}, ${now.getDate()} ${BULAN[now.getMonth()]} ${now.getFullYear()}`;
+      const el = document.getElementById('date-display');
+      if (el) el.textContent = str;
+    })();
+
+    // ── Dark Mode ─────────────────────────────────────────────
+    (function () {
+      const html = document.documentElement;
+      const STORAGE = 'sigap_darkmode';
+
+      if (localStorage.getItem(STORAGE) === '1') {
+        html.classList.add('dark');
+      }
+
+      function setDark(on) {
+        html.classList.add('dark-transitioning');
+        setTimeout(() => html.classList.remove('dark-transitioning'), 300);
+        if (on) {
+          html.classList.add('dark');
+          localStorage.setItem(STORAGE, '1');
+        } else {
+          html.classList.remove('dark');
+          localStorage.setItem(STORAGE, '0');
+        }
+        updateIcon();
+        updateChartsTheme();
+      }
+
+      function updateIcon() {
+        const isDark = html.classList.contains('dark');
+        const icon = document.getElementById('dm-icon');
+        const btn = document.getElementById('btn-darkmode');
+        if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        if (btn) btn.title = isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap';
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        updateIcon();
+        const btn = document.getElementById('btn-darkmode');
+        if (btn) btn.addEventListener('click', function () {
+          setDark(!html.classList.contains('dark'));
+        });
+      });
+    })();
+
+    // ── Logout confirmation — Custom Modal Overlay ────────────
+    (function () {
+      const overlay = document.getElementById('modalKeluarOverlay');
+      const btnOk = document.getElementById('btn-konfirmasi-keluar');
+      const btnBatal = document.getElementById('btn-batal-keluar');
+
+      function openModal() {
+        overlay.classList.add('active');
+      }
+
+      function closeModal() {
+        overlay.classList.remove('active');
+        btnOk.disabled = false;
+        btnOk.textContent = 'Ya, Keluar';
+      }
+
+      // Intercept setiap tombol [data-logout]
+      document.querySelectorAll('[data-logout]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openModal();
+        }, true);
+      });
+
+      // Klik backdrop → tutup
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+      });
+
+      // Tombol Batal
+      btnBatal.addEventListener('click', closeModal);
+
+      // Tombol Ya, Keluar → logout
+      btnOk.addEventListener('click', function () {
+        btnOk.disabled = true;
+        btnOk.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-1"></i> Keluar…';
+        setTimeout(function () {
+          closeModal();
+          // Bersihkan session
+          localStorage.clear();
+          sessionStorage.clear();
+          // Panggil fungsi logout api.js jika ada (tanpa mengandalkan redirect-nya)
+          if (typeof logout === 'function') {
+            try { logout(); } catch (e) { }
+          }
+          // Paksa redirect ke halaman login
+          window.location.href = 'login.html';
+        }, 500);
+      });
+
+      // ESC → tutup
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+      });
+    })();
+
+    // ── Close info panel ─────────────────────────────────────
+    document.getElementById('close-info').addEventListener('click', function () {
+      const panel = document.getElementById('info-panel');
+      panel.style.transition = 'opacity 0.3s, max-height 0.4s';
+      panel.style.overflow = 'hidden';
+      panel.style.opacity = '0';
+      panel.style.maxHeight = '0';
+      panel.style.marginBottom = '0';
+      panel.style.padding = '0';
+    });
+
+    // ── Compute statistics & Fetch ──────────────────────────────
+    let lastLoad = 0;
+    async function loadDashboard() {
+      lastLoad = Date.now();
+      const res = await apiRequest('../api/dashboard.php');
+      if (!res || !res.success) return;
+
+      const d = res.data;
+
+      const bl = document.getElementById('bulan-label');
+      if (bl && d.bulan_label) bl.textContent = d.bulan_label;
+
+      // Metric cards
+      animateCount(document.getElementById('m-total-siswa'), d.total_siswa, 900);
+      animateCount(document.getElementById('m-pelanggaran'), d.pelanggaran_bulan_ini, 700);
+      animateCount(document.getElementById('m-pending'), d.wa_pending, 600);
+      animateCount(document.getElementById('m-wa-sent'), d.wa_terkirim, 750);
+
+      // WA status detail
+      document.getElementById('ws-terkirim').textContent = d.wa_terkirim;
+      document.getElementById('ws-pending').textContent = d.wa_pending;
+      document.getElementById('ws-gagal').textContent = d.wa_gagal;
+      document.getElementById('ws-total').textContent = d.wa_total;
+      document.getElementById('ws-rate').textContent = d.wa_success_rate + '%';
+
+      const bar = document.getElementById('wa-legend-bar');
+      if (bar && d.wa_total > 0) {
+        bar.innerHTML = '';
+        const segments = [
+          { color: 'var(--success)', count: d.wa_terkirim },
+          { color: 'var(--warning)', count: d.wa_pending },
+          { color: 'var(--danger)', count: d.wa_gagal },
+        ];
+        segments.forEach(s => {
+          const pct = (s.count / d.wa_total) * 100;
+          if (pct > 0) {
+            const seg = document.createElement('div');
+            seg.style.cssText = `flex:${pct}; background:${s.color}; border-radius:100px; transition:flex 0.8s ease;`;
+            bar.appendChild(seg);
+          }
+        });
+      }
+
+      // Recent table
+      renderRecentTable(d.pelanggaran_terbaru);
+
+      // Update footer total
+      document.getElementById('total-records').textContent = d.pelanggaran_total;
+
+      Chart.defaults.font.family = "'Inter', sans-serif";
+      Chart.defaults.color = chartTheme().text;
+
+      // Charts (setelah DOM siap)
+      renderBarChart(d.frekuensi_jenis_bulan_ini);
+      renderPieChart(d.pelanggaran_per_kelas);
+    }
+
+    // Panggil saat halaman load
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+
+    // Muat ulang data saat kembali ke halaman ini (tombol Back / pindah tab / dari Riwayat)
+    // supaya angka selalu mengikuti perubahan terbaru di Riwayat.
+    window.addEventListener('pageshow', function (e) { if (e.persisted) loadDashboard(); });
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible' && Date.now() - lastLoad > 5000) loadDashboard();
+    });
+
+    // ── Recent table ──────────────────────────────────────────
+    function renderRecentTable(data) {
+      const tbody = document.getElementById('recent-tbody');
+      if (!tbody) return;
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `
+      <tr>
+        <td colspan="8">
+          <div class="empty-state" style="padding:40px 24px;">
+            <i class="fa-solid fa-inbox"></i>
+            <h4>Belum ada data pelanggaran</h4>
+            <p>Tambahkan pelanggaran pertama melalui menu Input Pelanggaran.</p>
+          </div>
+        </td>
+      </tr>`;
+        return;
+      }
+
+      const waMap = {
+        'Terkirim': '<span class="badge badge-success"><i class="fa-solid fa-check-double"></i> Terkirim</span>',
+        'Pending': '<span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pending</span>',
+        'Gagal': '<span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> Gagal</span>',
+      };
+
+      tbody.innerHTML = data.map((p, idx) => {
+        return `
+      <tr>
+        <td data-label="No" style="font-size:12px; color:var(--gray-400); font-family:var(--font-mono);">${idx + 1}</td>
+        <td data-label="Siswa">
+          <div class="student-cell">
+            <span class="s-name">${p.nama_siswa}</span>
+            <span class="s-nis">${p.nis}</span>
+          </div>
+        </td>
+        <td data-label="Kelas">
+          <span class="badge badge-primary" style="font-size:11px;">${p.kelas}</span>
+        </td>
+        <td data-label="Jenis">
+          <span class="badge badge-${p.jenis_color || 'info'}" style="font-size:11.5px;">${p.nama_jenis}</span>
+        </td>
+        <td data-label="Tanggal" style="font-size:13px; color:var(--gray-600); white-space:nowrap;">
+          <i class="fa-regular fa-calendar" style="font-size:10px; margin-right:4px;"></i>
+          ${formatTanggalJS(p.tanggal)}
+        </td>
+        <td data-label="Poin">
+          <span style="font-weight:700; color:var(--warning); font-size:13px;">
+            ${p.poin} <small style="font-weight:400; color:var(--gray-400); font-size:10px;">poin</small>
+          </span>
+        </td>
+        <td data-label="Status WA">${waMap[p.status_wa] || p.status_wa}</td>
+        <td data-label="Aksi">
+          <a href="riwayat.html" class="btn-action btn-action-view" title="Lihat detail">
+            <i class="fa-solid fa-eye"></i> Detail
+          </a>
+        </td>
+      </tr>`;
+      }).join('');
+    }
+
+    // ── Charts ────────────────────────────────────────────────
+    let barChartInstance = null;
+    let pieChartInstance = null;
+
+    function isDarkMode() {
+      return document.documentElement.classList.contains('dark');
+    }
+
+    function chartTheme() {
+      return isDarkMode()
+        ? { text: '#94a3b8', grid: 'rgba(255,255,255,0.08)', border: '#1e293b' }
+        : { text: '#64748b', grid: 'rgba(0,0,0,0.05)', border: '#ffffff' };
+    }
+
+    // Update existing chart instances in place when dark mode is toggled
+    function updateChartsTheme() {
+      const theme = chartTheme();
+      Chart.defaults.color = theme.text;
+
+      if (barChartInstance) {
+        barChartInstance.options.scales.y.grid.color = theme.grid;
+        barChartInstance.options.scales.x.ticks.color = theme.text;
+        barChartInstance.options.scales.y.ticks.color = theme.text;
+        barChartInstance.update();
+      }
+      if (pieChartInstance) {
+        pieChartInstance.data.datasets[0].borderColor = theme.border;
+        pieChartInstance.options.plugins.legend.labels.color = theme.text;
+        pieChartInstance.update();
+      }
+    }
+
+    // Bar chart — top jenis pelanggaran bulan ini
+    function renderBarChart(frekuensiData) {
+      const labels = frekuensiData.map(f => f.nama_jenis);
+      const counts = frekuensiData.map(f => parseInt(f.jumlah));
+      const theme = chartTheme();
+
+      const barColors = [
+        'rgba(26,79,160,0.85)', 'rgba(220,38,38,0.85)', 'rgba(217,119,6,0.85)',
+        'rgba(22,163,74,0.85)', 'rgba(124,58,237,0.85)', 'rgba(8,145,178,0.85)',
+      ];
+
+      if (barChartInstance) barChartInstance.destroy();
+      const ctx = document.getElementById('chart-bar').getContext('2d');
+      barChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Jumlah',
+            data: counts,
+            backgroundColor: barColors,
+            borderRadius: 6,
+            borderSkipped: false,
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleFont: { size: 12, weight: '600' },
+              bodyFont: { size: 12 },
+              padding: 10,
+              cornerRadius: 8,
+              callbacks: {
+                label: ctx => ` ${ctx.parsed.y} kasus`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: theme.text,
+                font: { size: 11 },
+                maxRotation: 30,
+                callback: function (val) {
+                  const label = this.getLabelForValue(val);
+                  return label.length > 14 ? label.substring(0, 13) + '…' : label;
+                },
+              },
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: theme.text,
+                stepSize: 1,
+                font: { size: 11 },
+              },
+              grid: {
+                color: theme.grid,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    // Pie chart — pelanggaran per kelas
+    function renderPieChart(perKelasData) {
+      const labels = perKelasData.map(k => k.kelas);
+      const counts = perKelasData.map(k => parseInt(k.jumlah));
+      const colors = ['rgba(26,79,160,0.88)', 'rgba(22,163,74,0.88)', 'rgba(220,38,38,0.88)',
+        'rgba(217,119,6,0.88)', 'rgba(124,58,237,0.88)', 'rgba(8,145,178,0.88)'];
+      const theme = chartTheme();
+
+      if (pieChartInstance) pieChartInstance.destroy();
+      const ctx = document.getElementById('chart-pie').getContext('2d');
+      pieChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: counts,
+            backgroundColor: colors,
+            borderWidth: 2,
+            borderColor: theme.border,
+            hoverOffset: 6,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '60%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: theme.text,
+                padding: 10,
+                boxWidth: 12,
+                boxHeight: 12,
+                font: { size: 11 },
+                usePointStyle: true,
+                pointStyle: 'circle',
+              },
+            },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleFont: { size: 12, weight: '600' },
+              bodyFont: { size: 12 },
+              padding: 10,
+              cornerRadius: 8,
+              callbacks: {
+                label: ctx => ` ${ctx.label}: ${ctx.parsed} kasus`,
+              },
+            },
+          },
+        },
+      });
+    }
+  </script>
+</body>
+
+</html>

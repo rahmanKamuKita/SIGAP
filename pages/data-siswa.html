@@ -1,0 +1,3177 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Siswa — SIGAP</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="../assets/images/logo-sekolah.png">
+
+  <style>
+    /* ── Page-specific styles ───────────────────────────── */
+
+    /* Avatar initials in table */
+    .student-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .student-row-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .student-name-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .student-name-block .s-name {
+      font-weight: 600;
+      color: var(--gray-900);
+      font-size: 13.5px;
+    }
+
+    .student-name-block .s-nis {
+      font-size: 11.5px;
+      color: var(--gray-400);
+      font-family: var(--font-mono);
+    }
+
+    /* WA number display */
+    .wa-number {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--gray-600);
+    }
+
+    .wa-number i {
+      color: var(--wa-green);
+      font-size: 13px;
+    }
+
+    /* Gender badge */
+    .gender-badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    .gender-badge.L {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .gender-badge.P {
+      background: #fce7f3;
+      color: #be185d;
+    }
+
+    /* Action buttons group */
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Stats bar above table */
+    .table-stats {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 16px;
+      background: var(--gray-50);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-200);
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .table-stat-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+    }
+
+    .table-stat-item i {
+      font-size: 12px;
+      color: var(--primary);
+    }
+
+    .table-stat-item strong {
+      color: var(--gray-900);
+      font-weight: 700;
+    }
+
+    .table-stat-item span {
+      color: var(--gray-500);
+    }
+
+    .table-stat-sep {
+      width: 1px;
+      height: 18px;
+      background: var(--gray-300);
+    }
+
+    /* Delete confirmation modal specifics */
+    .delete-confirm-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--danger-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--danger);
+      margin: 0 auto 16px;
+    }
+
+    /* Form modal: pelanggaran count badge */
+    .violation-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      background: var(--warning-light);
+      color: var(--warning);
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Input with prefix */
+    .input-with-prefix {
+      display: flex;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all var(--transition-fast);
+    }
+
+    .input-with-prefix:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26, 79, 160, 0.1);
+    }
+
+    .input-prefix {
+      padding: 10px 12px;
+      background: var(--gray-100);
+      border-right: 1.5px solid var(--gray-200);
+      font-size: 13px;
+      color: var(--gray-500);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+
+    .input-prefix i {
+      color: var(--wa-green);
+    }
+
+    .input-with-prefix .input-form {
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      flex: 1;
+    }
+
+    /* Avatar color palette */
+    .av-0 {
+      background: linear-gradient(135deg, #1a4fa0, #2563c8);
+    }
+
+    .av-1 {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+    }
+
+    .av-2 {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+    }
+
+    .av-3 {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+    }
+
+    .av-4 {
+      background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    }
+
+    .av-5 {
+      background: linear-gradient(135deg, #0891b2, #22d3ee);
+    }
+
+    .av-6 {
+      background: linear-gradient(135deg, #db2777, #ec4899);
+    }
+
+    .av-7 {
+      background: linear-gradient(135deg, #059669, #34d399);
+    }
+
+    .av-8 {
+      background: linear-gradient(135deg, #ea580c, #fb923c);
+    }
+
+    .av-9 {
+      background: linear-gradient(135deg, #4f46e5, #818cf8);
+    }
+
+    .av-10 {
+      background: linear-gradient(135deg, #0d9488, #2dd4bf);
+    }
+
+    .av-11 {
+      background: linear-gradient(135deg, #65a30d, #a3e635);
+    }
+
+    /* Highlight search match */
+    .highlight {
+      background: #fef08a;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
+    /* Empty state for table */
+    .table-empty-row td {
+      padding: 0 !important;
+      border: none !important;
+    }
+
+    /* Card animation */
+    .card {
+      animation: cardIn 0.4s ease both;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Required asterisk */
+    .req {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    /* Tooltip on WA link */
+    .wa-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--success);
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      background: var(--success-light);
+      transition: all var(--transition-fast);
+    }
+
+    .wa-link:hover {
+      background: var(--success);
+      color: white;
+    }
+
+    /* Violation history mini in detail */
+    .mini-violation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .mini-violation-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      background: var(--gray-50);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-100);
+      font-size: 12.5px;
+    }
+
+    .mini-violation-item .mv-jenis {
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    .mini-violation-item .mv-date {
+      color: var(--gray-400);
+      font-size: 11.5px;
+    }
+
+    @media (max-width: 768px) {
+      .table-stats {
+        gap: 12px;
+      }
+
+      .table-stat-sep {
+        display: none;
+      }
+    }
+
+    .sidebar-user-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 10px;
+      transition: background 0.18s;
+      cursor: pointer;
+    }
+
+    .sidebar-user-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-user-arrow {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.35);
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: color 0.18s, transform 0.18s;
+    }
+
+    .sidebar-user-link:hover .sidebar-user-arrow {
+      color: rgba(255, 255, 255, 0.75);
+      transform: translateX(2px);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       DATA SISWA REDESIGN — Konsisten dengan Login/Dashboard
+    ══════════════════════════════════════════════════════ */
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
+
+    /* ── Body & global ──────────────────────────────────── */
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f0f4ff;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 80% -10%, rgba(99, 130, 255, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 10% 100%, rgba(26, 79, 160, 0.05) 0%, transparent 60%);
+      background-attachment: fixed;
+    }
+
+    /* ── Sidebar ────────────────────────────────────────── */
+    .sidebar {
+      background: linear-gradient(180deg, #071a3e 0%, #0e2d6b 60%, #123780 100%);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .sidebar-brand {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .sidebar-brand-logo {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+
+    .sidebar-brand-text strong {
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    .sidebar-brand-text small {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .sidebar-nav a {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.6);
+      border-radius: 8px;
+      margin: 1px 10px;
+      padding: 10px 12px;
+      transition: all 0.18s;
+    }
+
+    .sidebar-nav a:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .sidebar-nav a.active {
+      color: white;
+      background: rgba(255, 255, 255, 0.14);
+      font-weight: 600;
+    }
+
+    .sidebar-nav a.active::before {
+      background: #5de08a;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 55%;
+    }
+
+    .sidebar-nav a i {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    .sidebar-section-label {
+      font-size: 9.5px;
+      letter-spacing: 1.2px;
+      color: rgba(255, 255, 255, 0.28);
+      padding: 10px 22px 4px;
+    }
+
+    .sidebar-divider {
+      background: rgba(255, 255, 255, 0.07);
+      margin: 6px 10px;
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 14px;
+    }
+
+    .sidebar-user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #2563c8, #5de08a);
+      font-size: 13px;
+      font-weight: 700;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .sidebar-user-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      line-height: 1.2;
+    }
+
+    .sidebar-user-info strong {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .sidebar-user-info span {
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ── Topbar ─────────────────────────────────────────── */
+    .topbar {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 1px 12px rgba(26, 79, 160, 0.06);
+    }
+
+    .topbar-page-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0d1f3c;
+      letter-spacing: -0.3px;
+    }
+
+    .topbar-user {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 100px;
+      padding: 5px 14px 5px 6px;
+      gap: 9px;
+      transition: all 0.18s;
+      text-decoration: none;
+    }
+
+    .topbar-user:hover {
+      border-color: #1a4fa0;
+      background: #f0f4ff;
+      box-shadow: 0 2px 12px rgba(26, 79, 160, 0.12);
+    }
+
+    .topbar-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #1a4fa0, #5de08a);
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid white;
+      box-shadow: 0 0 0 1.5px rgba(26, 79, 160, 0.2);
+    }
+
+    .topbar-user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .btn-logout {
+      border-radius: 100px;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-width: 1.5px;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.22);
+    }
+
+    /* ── Main content ───────────────────────────────────── */
+    .main-content {
+      padding: 24px 28px;
+    }
+
+    /* ── Page header ────────────────────────────────────── */
+    .page-header h2 {
+      font-size: 21px;
+      font-weight: 800;
+      color: #0d1f3c;
+      letter-spacing: -0.5px;
+    }
+
+    .page-header h2 i {
+      color: #1a4fa0;
+    }
+
+    /* ── Cards ──────────────────────────────────────────── */
+    .card {
+      background: white;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      animation: cardIn 0.4s ease both;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #fafbff;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0d1f3c;
+      letter-spacing: -0.2px;
+    }
+
+    .card-title i {
+      color: #1a4fa0;
+    }
+
+    .card-body {
+      padding: 18px 20px;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Filter bar & search ────────────────────────────── */
+    .input-form {
+      height: 40px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-family: 'DM Sans', sans-serif;
+      color: #0d1f3c;
+      background: white;
+      padding: 0 12px;
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+
+    .input-form::placeholder {
+      color: #c0ccd8;
+    }
+
+    .input-form:focus {
+      border-color: #1a4fa0;
+      box-shadow: 0 0 0 3.5px rgba(26, 79, 160, 0.10);
+    }
+
+    /* ── Table stats bar ────────────────────────────────── */
+    .table-stats {
+      background: #fafbff;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 10px;
+      padding: 11px 16px;
+    }
+
+    .table-stat-item {
+      font-size: 13px;
+    }
+
+    .table-stat-item strong {
+      font-weight: 700;
+      color: #0d1f3c;
+    }
+
+    .table-stat-item span {
+      color: #64748b;
+    }
+
+    .table-stat-item i {
+      color: #1a4fa0;
+    }
+
+    .table-stat-sep {
+      background: #e2e8f0;
+    }
+
+    /* ── Data table ─────────────────────────────────────── */
+    .data-table th {
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      padding: 11px 16px;
+      border-bottom: 1.5px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 13px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* ── Student info in table ──────────────────────────── */
+    .student-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      border: 2px solid white;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    }
+
+    .student-name-block .s-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0d1f3c;
+    }
+
+    .student-name-block .s-nis {
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    /* ── WA link badge ──────────────────────────────────── */
+    .wa-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #16a34a;
+      background: #dcfce7;
+      padding: 4px 10px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all 0.18s;
+    }
+
+    .wa-link:hover {
+      background: #16a34a;
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    /* ── Gender badge ───────────────────────────────────── */
+    .gender-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .gender-badge.L {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .gender-badge.P {
+      background: #fce7f3;
+      color: #be185d;
+    }
+
+    /* ── Action buttons ─────────────────────────────────── */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1.5px solid;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.18s;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-action-edit {
+      border-color: #e2e8f0;
+      color: #475569;
+      background: white;
+    }
+
+    .btn-action-edit:hover {
+      border-color: #1a4fa0;
+      color: #1a4fa0;
+      background: #f0f4ff;
+      box-shadow: 0 3px 10px rgba(26, 79, 160, 0.12);
+    }
+
+    .btn-action-detail,
+    .btn-action-view {
+      border-color: #e2e8f0;
+      color: #475569;
+      background: white;
+    }
+
+    .btn-action-detail:hover,
+    .btn-action-view:hover {
+      border-color: #0891b2;
+      color: #0891b2;
+      background: #f0f9ff;
+      box-shadow: 0 3px 10px rgba(8, 145, 178, 0.12);
+    }
+
+    .btn-action-delete {
+      border-color: #fecaca;
+      color: #dc2626;
+      background: #fff8f8;
+    }
+
+    .btn-action-delete:hover {
+      border-color: #dc2626;
+      background: #dc2626;
+      color: white;
+      box-shadow: 0 3px 10px rgba(220, 38, 38, 0.2);
+    }
+
+    /* ── Badges ─────────────────────────────────────────── */
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    .badge-primary {
+      background: #e8f0fb;
+      color: #1a4fa0;
+    }
+
+    .badge-success {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    /* ── Detail slide panel ─────────────────────────────── */
+    .detail-panel {
+      border-left: 1px solid rgba(226, 232, 240, 0.8);
+      background: white;
+    }
+
+    .detail-panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #fafbff;
+    }
+
+    /* ── Mini violation list ────────────────────────────── */
+    .mini-violation-item {
+      padding: 8px 12px;
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+      border-radius: 8px;
+      font-size: 12.5px;
+    }
+
+    .mini-violation-item .mv-jenis {
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .mini-violation-item .mv-date {
+      color: #94a3b8;
+      font-size: 11.5px;
+    }
+
+    /* ── Input with prefix (WA) ─────────────────────────── */
+    .input-with-prefix {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.18s;
+    }
+
+    .input-with-prefix:focus-within {
+      border-color: #1a4fa0;
+      box-shadow: 0 0 0 3.5px rgba(26, 79, 160, 0.10);
+    }
+
+    .input-prefix {
+      padding: 10px 12px;
+      background: #f8fafc;
+      border-right: 1.5px solid #e2e8f0;
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .input-prefix i {
+      color: #25d366;
+    }
+
+    /* ── Delete confirm icon ────────────────────────────── */
+    .delete-confirm-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #fee2e2;
+      color: #dc2626;
+      font-size: 28px;
+    }
+
+    /* ── Highlight search ───────────────────────────────── */
+    .highlight {
+      background: #fef08a;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
+    /* ── Select dropdown ────────────────────────────────── */
+    select.input-form {
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 15px;
+      padding-right: 32px;
+    }
+
+    /* ── Tombol tambah siswa ────────────────────────────── */
+    .btn-primary {
+      background: linear-gradient(135deg, #1a4fa0, #2563c8);
+      border: none;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: white;
+      padding: 9px 18px;
+      box-shadow: 0 4px 14px rgba(26, 79, 160, 0.28);
+      transition: all 0.18s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(26, 79, 160, 0.38);
+    }
+
+    /* ── Violation count badge ──────────────────────────── */
+    .violation-count-badge {
+      background: #fef3c7;
+      color: #d97706;
+      border-radius: 100px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .table-stats {
+        gap: 12px;
+      }
+
+      .table-stat-sep {
+        display: none;
+      }
+
+      /* Search box tidak lagi dibatasi lebar di layar sempit
+         (mengalahkan inline style max-width:320px) */
+      .search-input-wrapper {
+        max-width: none !important;
+      }
+
+      /* Pagination boleh melipat ke baris baru */
+      .pagination-wrapper {
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .pagination-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .filter-bar>div[style*="margin-left:auto"] {
+        margin-left: 0 !important;
+        width: 100%;
+      }
+
+      /* ── Topbar (navbar atas) ─────────────────────────── */
+      .topbar {
+        padding: 0 14px;
+        gap: 10px;
+      }
+
+      .topbar-left {
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .topbar-page-title {
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+      }
+
+      .topbar-right {
+        gap: 8px;
+      }
+
+      .topbar-date {
+        padding: 5px 10px;
+        font-size: 11.5px;
+      }
+
+      .topbar-user {
+        padding: 5px 8px;
+      }
+
+      .btn-logout {
+        padding: 7px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .topbar {
+        padding: 0 10px;
+      }
+
+      .topbar-breadcrumb {
+        display: none;
+      }
+
+      .topbar-date {
+        display: none;
+      }
+
+      .btn-logout-text {
+        display: none;
+      }
+
+      .btn-logout {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+      }
+
+      .topbar-user {
+        padding: 0;
+        border: none;
+        background: none;
+      }
+    }
+
+    /* ── Tabel siswa → kartu bertumpuk di layar sempit ──── */
+    @media (max-width: 640px) {
+      .table-wrapper {
+        overflow-x: visible;
+        padding: 12px;
+      }
+
+      #siswa-table thead {
+        display: none;
+      }
+
+      #siswa-table,
+      #siswa-table tbody,
+      #siswa-table tr,
+      #siswa-table td {
+        display: block;
+        width: 100%;
+      }
+
+      #siswa-table tbody tr {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        margin: 0 0 12px;
+        padding: 4px 14px;
+      }
+
+      #siswa-table tbody tr:last-child {
+        margin-bottom: 0;
+      }
+
+      #siswa-table tbody tr:hover td {
+        background: transparent;
+      }
+
+      #siswa-table td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 0;
+        border-bottom: 1px solid #f1f5f9;
+        text-align: right;
+      }
+
+      #siswa-table td:last-child {
+        border-bottom: none;
+      }
+
+      #siswa-table td::before {
+        content: attr(data-label);
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        text-align: left;
+        flex-shrink: 0;
+      }
+
+      #siswa-table td[data-label="No"] {
+        display: none;
+      }
+
+      #siswa-table td.table-empty-cell,
+      #siswa-table td[colspan] {
+        display: block;
+        text-align: center;
+      }
+
+      #siswa-table td[colspan]::before {
+        content: none;
+      }
+
+      /* Kartu "Nama Siswa" jadi header kartu: foto + nama
+         tampil penuh & rata kiri, bukan berdesakan di kanan */
+      #siswa-table td[data-label="Nama Siswa"] {
+        display: block;
+        padding: 10px 0 14px;
+        text-align: left;
+      }
+
+      #siswa-table td[data-label="Nama Siswa"]::before {
+        content: none;
+      }
+
+      #siswa-table .student-row-info {
+        justify-content: flex-start;
+      }
+
+      #siswa-table .student-avatar {
+        width: 42px;
+        height: 42px;
+        font-size: 13px;
+      }
+
+      /* Baris aksi jadi tombol full-width di bagian bawah kartu */
+      #siswa-table td[data-label="Aksi"] {
+        display: block;
+        padding: 12px 0 6px;
+        text-align: left;
+      }
+
+      #siswa-table td[data-label="Aksi"]::before {
+        content: none;
+      }
+
+      #siswa-table .action-group {
+        justify-content: stretch;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
+      #siswa-table .action-group .btn-action {
+        flex: 1 1 auto;
+        justify-content: center;
+      }
+
+      html.dark #siswa-table tbody tr {
+        background: var(--dm-surface) !important;
+        border-color: var(--dm-border) !important;
+      }
+
+      html.dark #siswa-table td {
+        border-bottom-color: var(--dm-border) !important;
+      }
+
+      html.dark #siswa-table td::before {
+        color: var(--dm-text-3) !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .table-stats {
+        gap: 10px 18px;
+      }
+
+      .table-stat-item {
+        flex: 1 1 40%;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════
+       DARK MODE — DATA SISWA
+    ════════════════════════════════════════════════════════ */
+
+    :root {
+      --dm-bg: #0f172a;
+      --dm-surface: #1e293b;
+      --dm-surface-2: #253348;
+      --dm-surface-3: #2d3f55;
+      --dm-border: #2e3f55;
+      --dm-border-strong: #3d5068;
+      --dm-text: #e2e8f0;
+      --dm-text-2: #94a3b8;
+      --dm-text-3: #64748b;
+      --dm-accent: #3b82f6;
+      --dm-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+      --dm-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --dm-sidebar: #0d1829;
+      --dm-topbar: rgba(13, 24, 41, 0.95);
+    }
+
+    html.dark-transitioning *,
+    html.dark-transitioning *::before,
+    html.dark-transitioning *::after {
+      transition:
+        background-color 0.22s ease,
+        border-color 0.22s ease,
+        color 0.18s ease,
+        box-shadow 0.22s ease !important;
+    }
+
+    /* ── Body ─────────────────────────────────────────────── */
+    html.dark body {
+      background: var(--dm-bg) !important;
+      background-image: none !important;
+      color: var(--dm-text) !important;
+    }
+
+    /* ── Sidebar ──────────────────────────────────────────── */
+    html.dark .sidebar {
+      background: var(--dm-sidebar) !important;
+      border-right: 1px solid var(--dm-border) !important;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* Detail siswa — teks terbaca di dark mode */
+    html.dark .detail-label {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .detail-value {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .detail-item {
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-brand {
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-brand-logo {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html.dark .sidebar-brand-text strong {
+      color: #fff !important;
+    }
+
+    html.dark .sidebar-brand-text small {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+
+    html.dark .sidebar-nav a {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .sidebar-nav a.active {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #60a5fa !important;
+    }
+
+    html.dark .sidebar-nav a.active::before {
+      background: #60a5fa !important;
+    }
+
+    html.dark .sidebar-section-label {
+      color: rgba(100, 116, 139, 0.7) !important;
+    }
+
+    html.dark .sidebar-divider {
+      border-color: var(--dm-border) !important;
+      background: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-footer {
+      border-top-color: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-user-info strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .sidebar-user-info span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .sidebar-user-arrow {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .sidebar-user-link:hover {
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* ── Topbar ───────────────────────────────────────────── */
+    html.dark .topbar {
+      background: var(--dm-topbar) !important;
+      border-bottom-color: var(--dm-border) !important;
+      box-shadow: 0 1px 0 var(--dm-border), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+      backdrop-filter: blur(20px) !important;
+    }
+
+    html.dark .topbar-page-title {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .topbar-breadcrumb {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .topbar-hamburger {
+      color: var(--dm-text-2) !important;
+      background: transparent !important;
+    }
+
+    html.dark .topbar-hamburger:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .topbar-user {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .topbar-user:hover {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-accent) !important;
+      box-shadow: 0 2px 12px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    html.dark .topbar-user-name {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .btn-logout {
+      background: rgba(220, 38, 38, 0.12) !important;
+      border-color: rgba(220, 38, 38, 0.3) !important;
+      color: #f87171 !important;
+    }
+
+    html.dark .btn-logout:hover {
+      background: rgba(220, 38, 38, 0.22) !important;
+      border-color: #f87171 !important;
+    }
+
+    /* ── Dark mode toggle button ──────────────────────────── */
+    .btn-darkmode {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-darkmode:hover {
+      border-color: #1a4fa0;
+      color: #1a4fa0;
+      background: #eff6ff;
+    }
+
+    html.dark .btn-darkmode {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: var(--dm-border) !important;
+      color: #fbbf24 !important;
+    }
+
+    html.dark .btn-darkmode:hover {
+      background: rgba(251, 191, 36, 0.12) !important;
+      border-color: #fbbf24 !important;
+      color: #fcd34d !important;
+    }
+
+    /* ── Topbar date chip ─────────────────────────────────── */
+    .topbar-date {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--gray-500);
+      padding: 6px 12px;
+      background: var(--gray-100);
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+
+    .topbar-date i {
+      font-size: 11px;
+      color: var(--primary);
+    }
+
+    html.dark .topbar-date {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: var(--dm-text-2) !important;
+      border: 1px solid var(--dm-border) !important;
+    }
+
+    html.dark .topbar-date i {
+      color: #60a5fa !important;
+    }
+
+    /* ── Page header ──────────────────────────────────────── */
+    html.dark .page-header h2 {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .page-header h2 i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .page-header p,
+    html.dark .page-subtitle {
+      color: var(--dm-text-2) !important;
+    }
+
+    /* ── Cards ────────────────────────────────────────────── */
+    html.dark .card {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+      box-shadow: var(--dm-shadow-sm) !important;
+    }
+
+    html.dark .card-header {
+      background: var(--dm-surface-2) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .card-title {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .card-title i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .card-body {
+      background: var(--dm-surface) !important;
+    }
+
+    /* ── Table stats bar ──────────────────────────────────── */
+    html.dark .table-stats {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .table-stat-item strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .table-stat-item span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .table-stat-item i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .table-stat-sep {
+      background: var(--dm-border) !important;
+    }
+
+    /* ── Filter bar ───────────────────────────────────────── */
+    html.dark .filter-bar {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .search-input-wrapper {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .search-input-wrapper i {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .search-input,
+    html.dark .filter-select,
+    html.dark .input-form {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .search-input::placeholder,
+    html.dark .input-form::placeholder {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .search-input:focus,
+    html.dark .filter-select:focus,
+    html.dark .input-form:focus {
+      border-color: var(--dm-accent) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }
+
+    html.dark .filter-select option {
+      background: var(--dm-surface-2);
+      color: var(--dm-text);
+    }
+
+    html.dark .filter-bar span,
+    html.dark .filter-bar strong {
+      color: var(--dm-text-2) !important;
+    }
+
+    /* Reset button */
+    html.dark .btn.btn-secondary {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .btn.btn-secondary:hover {
+      border-color: var(--dm-accent) !important;
+      color: var(--dm-text) !important;
+    }
+
+    /* Showing count text */
+    html.dark .filter-bar>div[style*="color"] {
+      color: var(--dm-text-2) !important;
+    }
+
+    /* ── Data table ───────────────────────────────────────── */
+    html.dark .data-table th {
+      background: var(--dm-surface-2) !important;
+      color: var(--dm-text-2) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .data-table td {
+      color: var(--dm-text) !important;
+      border-bottom-color: var(--dm-border) !important;
+      background: transparent !important;
+    }
+
+    html.dark .data-table tbody tr {
+      background: var(--dm-surface) !important;
+    }
+
+    html.dark .data-table tr:hover td {
+      background: var(--dm-surface-2) !important;
+    }
+
+    html.dark .data-table tr:last-child td {
+      border-bottom: none !important;
+    }
+
+    html.dark .table-wrapper {
+      background: var(--dm-surface) !important;
+    }
+
+    /* ── Student info ─────────────────────────────────────── */
+    html.dark .student-name-block .s-name {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .student-name-block .s-nis {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .student-avatar {
+      border-color: var(--dm-surface-2) !important;
+    }
+
+    /* ── Gender badge (keep tinted but darken bg) ─────────── */
+    html.dark .gender-badge.L {
+      background: rgba(29, 78, 216, 0.25) !important;
+      color: #93c5fd !important;
+    }
+
+    html.dark .gender-badge.P {
+      background: rgba(190, 24, 93, 0.25) !important;
+      color: #f9a8d4 !important;
+    }
+
+    /* ── WA link badge ────────────────────────────────────── */
+    html.dark .wa-link {
+      background: rgba(22, 163, 74, 0.15) !important;
+      color: #4ade80 !important;
+    }
+
+    html.dark .wa-link:hover {
+      background: rgba(22, 163, 74, 0.35) !important;
+      color: #86efac !important;
+    }
+
+    /* ── Badges ───────────────────────────────────────────── */
+    html.dark .badge-primary {
+      background: rgba(59, 130, 246, 0.18) !important;
+      color: #93c5fd !important;
+    }
+
+    html.dark .badge-success {
+      background: rgba(34, 197, 94, 0.15) !important;
+      color: #4ade80 !important;
+    }
+
+    html.dark .badge-warning {
+      background: rgba(234, 179, 8, 0.15) !important;
+      color: #fbbf24 !important;
+    }
+
+    html.dark .badge-danger {
+      background: rgba(239, 68, 68, 0.15) !important;
+      color: #f87171 !important;
+    }
+
+    /* ── Action buttons ───────────────────────────────────── */
+    html.dark .btn-action-edit,
+    html.dark .btn-action-detail,
+    html.dark .btn-action-view {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .btn-action-edit:hover {
+      border-color: #60a5fa !important;
+      color: #60a5fa !important;
+      background: rgba(59, 130, 246, 0.1) !important;
+    }
+
+    html.dark .btn-action-detail:hover,
+    html.dark .btn-action-view:hover {
+      border-color: #22d3ee !important;
+      color: #22d3ee !important;
+      background: rgba(8, 145, 178, 0.1) !important;
+    }
+
+    html.dark .btn-action-delete {
+      background: rgba(220, 38, 38, 0.08) !important;
+      border-color: rgba(220, 38, 38, 0.25) !important;
+      color: #f87171 !important;
+    }
+
+    html.dark .btn-action-delete:hover {
+      background: rgba(220, 38, 38, 0.25) !important;
+      border-color: #f87171 !important;
+      color: white !important;
+    }
+
+    /* ── Pagination ───────────────────────────────────────── */
+    html.dark .pagination-wrapper {
+      background: var(--dm-surface-2) !important;
+      border-top-color: var(--dm-border) !important;
+    }
+
+    html.dark .pagination-info {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .pagination-info strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .pagination-controls .page-btn {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .pagination-controls .page-btn:hover {
+      border-color: var(--dm-accent) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .pagination-controls .page-btn.active {
+      background: var(--dm-accent) !important;
+      border-color: var(--dm-accent) !important;
+      color: white !important;
+    }
+
+    /* ── Highlight search ─────────────────────────────────── */
+    html.dark .highlight {
+      background: rgba(234, 179, 8, 0.3) !important;
+      color: #fcd34d !important;
+    }
+
+    /* ── Mini violation items ─────────────────────────────── */
+    html.dark .mini-violation-item {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .mini-violation-item .mv-jenis {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .mini-violation-item .mv-date {
+      color: var(--dm-text-3) !important;
+    }
+
+    /* ── Input with WA prefix ─────────────────────────────── */
+    html.dark .input-with-prefix {
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .input-with-prefix:focus-within {
+      border-color: var(--dm-accent) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }
+
+    html.dark .input-prefix {
+      background: var(--dm-surface-3) !important;
+      border-right-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    /* ── Modals ───────────────────────────────────────────── */
+    html.dark .modal-overlay {
+      background: rgba(0, 0, 0, 0.65) !important;
+    }
+
+    html.dark .modal {
+      background: var(--dm-surface) !important;
+      border: 1px solid var(--dm-border) !important;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    html.dark .modal-header {
+      background: var(--dm-surface-2) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .modal-title {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .modal-title i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .modal-close {
+      color: var(--dm-text-3) !important;
+      background: transparent !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .modal-close:hover {
+      color: var(--dm-text) !important;
+      background: var(--dm-surface-3) !important;
+    }
+
+    html.dark .modal-body {
+      background: var(--dm-surface) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .modal-footer {
+      background: var(--dm-surface-2) !important;
+      border-top-color: var(--dm-border) !important;
+    }
+
+    html.dark .form-label {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .form-section-title {
+      color: var(--dm-text-3) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .form-error {
+      color: #f87171 !important;
+    }
+
+    /* Detail modal specifics */
+    html.dark .detail-panel-header {
+      background: var(--dm-surface-2) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark #detail-nama {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark #detail-kelas,
+    html.dark #detail-nis {
+      color: var(--dm-text-2) !important;
+    }
+
+    /* Delete confirm icon */
+    html.dark .delete-confirm-icon {
+      background: rgba(220, 38, 38, 0.15) !important;
+      color: #f87171 !important;
+    }
+
+    /* Modal konfirmasi hapus — teks terbaca di dark mode */
+    html.dark .delete-confirm-title {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .delete-confirm-text {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .delete-confirm-name {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .delete-confirm-warning {
+      background: rgba(217, 119, 6, 0.18) !important;
+      color: #fbbf24 !important;
+    }
+
+    /* Violation count badge */
+    html.dark .violation-count-badge {
+      background: rgba(217, 119, 6, 0.18) !important;
+      color: #fbbf24 !important;
+    }
+
+    /* ── Scrollbar ────────────────────────────────────────── */
+    html.dark ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    html.dark ::-webkit-scrollbar-track {
+      background: var(--dm-bg);
+    }
+
+    html.dark ::-webkit-scrollbar-thumb {
+      background: var(--dm-border-strong);
+      border-radius: 999px;
+    }
+
+    html.dark ::-webkit-scrollbar-thumb:hover {
+      background: #4a6080;
+    }
+
+    /* ── Empty state ──────────────────────────────────────── */
+    html.dark .empty-state h4 {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .empty-state p {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .empty-state i {
+      color: var(--dm-text-3) !important;
+    }
+
+    /* ── Text helpers ─────────────────────────────────────── */
+    html.dark .text-muted {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark small {
+      color: var(--dm-text-3) !important;
+    }
+
+    /* inline showing count text in filter bar */
+    html.dark #showing-count,
+    html.dark #total-count {
+      color: var(--dm-text) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+
+    <!-- Sidebar overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- ═══════════════════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+      <!-- Brand -->
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo">
+          <img src="../assets/images/logo-sekolah.png" alt="Logo SMK Negeri 1 Masbagik"
+            style="width:30px; height:30px; object-fit:contain;">
+        </div>
+        <div class="sidebar-brand-text">
+          <strong>SIGAP</strong>
+          <small id="sb-school">SMKN 1 Masbagik</small>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Menu Utama</div>
+
+        <a href="dashboard.html">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="data-siswa.html">
+          <i class="fa-solid fa-users"></i>
+          <span>Data Siswa</span>
+        </a>
+        <a href="input-pelanggaran.html">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>Input Pelanggaran</span>
+        </a>
+        <a href="riwayat.html">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Riwayat</span>
+        </a>
+        <a href="laporan.html">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Laporan</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-label">Akun</div>
+
+        <a href="profile.html">
+          <i class="fa-solid fa-user-circle"></i>
+          <span>Profil Saya</span>
+        </a>
+        <a href="#" data-logout>
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Keluar</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-user-avatar" id="sb-avatar">SW</div>
+          <div class="sidebar-user-info">
+            <strong id="sb-username">Sri Wahyuni</strong>
+            <span id="sb-role">Guru BK</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════════
+       TOPBAR
+  ════════════════════════════════════════════════════ -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-hamburger" id="hamburger-btn">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+          <div class="topbar-page-title" id="topbar-title">Data Siswa</div>
+          <div class="topbar-breadcrumb">
+            <i class="fa-solid fa-house" style="font-size:9px"></i>
+            <i class="fa-solid fa-chevron-right sep" style="font-size:8px"></i>
+            <span>Data Siswa</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="date-display">—</span>
+        </div>
+        <!-- Dark Mode Toggle -->
+        <button class="btn-darkmode" id="btn-darkmode" title="Ganti tema gelap/terang" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon" id="dm-icon"></i>
+        </button>
+        <a href="profile.html" class="topbar-user" title="Lihat Profil" style="text-decoration:none; cursor:pointer;">
+          <div class="topbar-avatar" id="topbar-avatar">—</div>
+          <span class="topbar-user-name" id="topbar-username">—</span>
+        </a>
+        <button class="btn-logout" data-logout>
+          <i class="fa-solid fa-right-from-bracket"></i> <span class="btn-logout-text">Keluar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════════════ -->
+    <main class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h2><i class="fa-solid fa-users"></i> Data Siswa</h2>
+          <p class="page-subtitle">Kelola data siswa dan informasi orang tua/wali</p>
+        </div>
+        <a href="tambah-siswa.html" class="btn btn-primary" id="btn-tambah">
+          <i class="fa-solid fa-user-plus"></i> Tambah Siswa
+        </a>
+      </div>
+
+      <!-- ── Stats bar ───────────────────────────────────── -->
+      <div class="table-stats">
+        <div class="table-stat-item">
+          <i class="fa-solid fa-users"></i>
+          <strong id="stat-total">0</strong>
+          <span>Total Siswa</span>
+        </div>
+        <div class="table-stat-sep"></div>
+        <div class="table-stat-item">
+          <i class="fa-solid fa-venus-mars"></i>
+          <strong id="stat-laki">0</strong>
+          <span>Laki-laki</span>
+        </div>
+        <div class="table-stat-sep"></div>
+        <div class="table-stat-item">
+          <i class="fa-solid fa-venus"></i>
+          <strong id="stat-perempuan">0</strong>
+          <span>Perempuan</span>
+        </div>
+        <div class="table-stat-sep"></div>
+        <div class="table-stat-item">
+          <i class="fa-solid fa-layer-group"></i>
+          <strong id="stat-kelas">0</strong>
+          <span>Kelas Terdaftar</span>
+        </div>
+        <div class="table-stat-sep"></div>
+        <div class="table-stat-item">
+          <i class="fa-brands fa-whatsapp" style="color:var(--wa-green)"></i>
+          <strong id="stat-wa">0</strong>
+          <span>Nomor WA Terdaftar</span>
+        </div>
+      </div>
+
+      <!-- ── Filter Bar ──────────────────────────────────── -->
+      <div class="filter-bar">
+        <div class="search-input-wrapper" style="max-width:320px;">
+          <i class="fa-solid fa-search"></i>
+          <input type="text" class="search-input" id="search-input" placeholder="Cari nama, NIS, atau kelas..." />
+        </div>
+        <select class="filter-select" id="filter-jurusan">
+          <option value="">Semua Jurusan</option>
+        </select>
+        <select class="filter-select" id="filter-kelas">
+          <option value="">Semua Kelas</option>
+        </select>
+        <select class="filter-select" id="filter-gender">
+          <option value="">Semua Gender</option>
+          <option value="L">Laki-laki</option>
+          <option value="P">Perempuan</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" id="btn-reset-filter" title="Reset filter">
+          <i class="fa-solid fa-rotate-left"></i> Reset
+        </button>
+        <div style="margin-left:auto; font-size:13px; color:var(--gray-500);">
+          Menampilkan <strong id="showing-count">0</strong> dari <strong id="total-count">0</strong> siswa
+        </div>
+      </div>
+
+      <!-- ── Data Table ──────────────────────────────────── -->
+      <div class="card">
+        <div class="table-wrapper">
+          <table class="data-table" id="siswa-table">
+            <thead>
+              <tr>
+                <th style="width:48px;">No</th>
+                <th>Nama Siswa</th>
+                <th>NIS</th>
+                <th>Kelas</th>
+                <th>No. WA Orang Tua</th>
+                <th>Pelanggaran</th>
+                <th style="width:140px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="siswa-tbody">
+              <!-- Diisi JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper">
+          <div class="pagination-info">
+            Halaman <strong id="page-current">1</strong> dari <strong id="page-total">1</strong>
+          </div>
+          <div class="pagination-controls" id="pagination-controls"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ═══════════════════════════════════════════════════════
+     MODAL: TAMBAH / EDIT SISWA
+════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-form">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-user-pen" id="modal-form-icon"></i>
+          <span id="modal-form-title">Tambah Siswa Baru</span>
+        </div>
+        <button class="modal-close" data-modal-close>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Section: Data Siswa -->
+        <div class="form-section-title">Data Siswa</div>
+        <div class="form-row cols-2">
+          <div>
+            <label class="form-label">Nama Lengkap <span class="req">*</span></label>
+            <input type="text" id="f-nama" class="input-form" placeholder="Contoh: Andi Prasetyo" />
+            <div class="form-error" id="err-nama">Nama lengkap wajib diisi.</div>
+          </div>
+          <div>
+            <label class="form-label">NIS (Nomor Induk Siswa) <span class="req">*</span></label>
+            <input type="text" id="f-nis" class="input-form" placeholder="Contoh: 2401001" maxlength="10" />
+            <div class="form-error" id="err-nis">NIS wajib diisi.</div>
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div>
+            <label class="form-label">Kelas <span class="req">*</span></label>
+            <select id="f-kelas" class="input-form">
+              <option value="">-- Pilih Kelas --</option>
+            </select>
+            <div class="form-error" id="err-kelas">Kelas wajib dipilih.</div>
+          </div>
+          <div>
+            <label class="form-label">Jurusan <span class="req">*</span></label>
+            <select id="f-jurusan" class="input-form">
+              <option value="">-- Pilih Jurusan --</option>
+            </select>
+            <div class="form-error" id="err-jurusan">Jurusan wajib dipilih.</div>
+          </div>
+        </div>
+        <div class="form-row cols-2">
+          <div>
+            <label class="form-label">Jenis Kelamin <span class="req">*</span></label>
+            <select id="f-gender" class="input-form">
+              <option value="">-- Pilih --</option>
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+            <div class="form-error" id="err-gender">Jenis kelamin wajib dipilih.</div>
+          </div>
+          <div></div>
+        </div>
+        <div class="form-row cols-1">
+          <div>
+            <label class="form-label">Alamat</label>
+            <input type="text" id="f-alamat" class="input-form" placeholder="Contoh: Jl. Merdeka No. 12, Masbagik" />
+          </div>
+        </div>
+
+        <!-- Section: Data Orang Tua/Wali -->
+        <div class="form-section-title" style="margin-top:20px;">Data Orang Tua / Wali</div>
+        <div class="form-row cols-2">
+          <div>
+            <label class="form-label">Nama Orang Tua / Wali</label>
+            <input type="text" id="f-nama-ortu" class="input-form" placeholder="Contoh: Bpk. Prasetyo Utomo" />
+          </div>
+          <div>
+            <label class="form-label">Nomor WhatsApp Orang Tua <span class="req">*</span></label>
+            <div class="input-with-prefix">
+              <div class="input-prefix">
+                <i class="fa-brands fa-whatsapp"></i> +62
+              </div>
+              <input type="tel" id="f-wa" class="input-form" placeholder="812-3456-7890" maxlength="14" />
+            </div>
+            <div class="form-error" id="err-wa">Nomor WA wajib diisi.</div>
+            <div class="form-help">Masukkan nomor tanpa angka 0 di depan. Contoh: 812-3456-7890</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close>
+          <i class="fa-solid fa-xmark"></i> Batal
+        </button>
+        <button class="btn btn-primary" id="btn-simpan">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+     MODAL: DETAIL SISWA
+════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-detail">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-id-card"></i>
+          <span>Detail Siswa</span>
+        </div>
+        <button class="modal-close" data-modal-close>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Profile header -->
+        <div
+          style="display:flex; align-items:center; gap:16px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--gray-100);">
+          <div class="student-avatar av-0" id="detail-avatar" style="width:56px; height:56px; font-size:18px;"></div>
+          <div>
+            <div style="font-size:18px; font-weight:700; color:var(--gray-900);" id="detail-nama">—</div>
+            <div style="display:flex; gap:8px; margin-top:4px; align-items:center;">
+              <span class="badge badge-primary" id="detail-kelas">—</span>
+              <span style="font-size:12px; color:var(--gray-400); font-family:var(--font-mono);"
+                id="detail-nis">—</span>
+              <span class="gender-badge" id="detail-gender-badge">—</span>
+            </div>
+          </div>
+          <div
+            style="margin-left:auto; text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <div class="violation-count-badge" id="detail-violation-count">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>0 Pelanggaran</span>
+            </div>
+            <!-- Persentase Pelanggaran Badge -->
+            <div id="detail-poin-wrap" style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+              <div
+                style="font-size:10px; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">
+                Tingkat Pelanggaran</div>
+              <div id="detail-poin-badge"
+                style="display:flex; align-items:center; gap:6px; font-size:15px; font-weight:800; color:var(--success);">
+                <i class="fa-solid fa-chart-pie" style="font-size:12px;"></i>
+                <span id="detail-poin-val">0%</span>
+              </div>
+              <!-- Progress bar -->
+              <div style="width:80px; height:5px; background:var(--gray-100); border-radius:99px; overflow:hidden;">
+                <div id="detail-poin-bar"
+                  style="height:100%; width:0%; background:var(--success); border-radius:99px; transition:width 0.4s ease, background 0.4s ease;">
+                </div>
+              </div>
+              <!-- Label tingkat -->
+              <div id="detail-poin-label" style="font-size:10px; font-weight:600; color:var(--success);">Baik</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail grid -->
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label"><i class="fa-solid fa-id-badge" style="margin-right:4px;"></i>NIS</div>
+            <div class="detail-value" id="d-nis">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label"><i class="fa-solid fa-chalkboard" style="margin-right:4px;"></i>Kelas</div>
+            <div class="detail-value" id="d-kelas">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label"><i class="fa-solid fa-venus-mars" style="margin-right:4px;"></i>Jenis Kelamin
+            </div>
+            <div class="detail-value" id="d-gender">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i>Alamat</div>
+            <div class="detail-value" id="d-alamat">—</div>
+          </div>
+          <div class="detail-divider"></div>
+          <div class="detail-item">
+            <div class="detail-label"><i class="fa-solid fa-person" style="margin-right:4px;"></i>Nama Orang Tua/Wali
+            </div>
+            <div class="detail-value" id="d-ortu">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label"><i class="fa-brands fa-whatsapp"
+                style="margin-right:4px; color:var(--wa-green);"></i>Nomor WA</div>
+            <div class="detail-value" id="d-wa">—</div>
+          </div>
+        </div>
+
+        <!-- Riwayat pelanggaran mini -->
+        <div style="margin-top:20px;">
+          <div class="form-section-title">Riwayat Pelanggaran Siswa</div>
+          <div class="mini-violation-list" id="detail-violations">
+            <div style="text-align:center; padding:16px; color:var(--gray-400); font-size:13px;">
+              <i class="fa-solid fa-circle-check"
+                style="color:var(--success); font-size:20px; display:block; margin-bottom:6px;"></i>
+              Tidak ada riwayat pelanggaran
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close>Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+     MODAL: KONFIRMASI HAPUS
+════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-hapus">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-trash" style="color:var(--danger);"></i>
+          Konfirmasi Hapus
+        </div>
+        <button class="modal-close" data-modal-close>
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="text-align:center; padding:28px 24px;">
+        <div class="delete-confirm-icon">
+          <i class="fa-solid fa-user-minus"></i>
+        </div>
+        <h4 class="delete-confirm-title"
+          style="font-size:16px; font-weight:700; color:var(--gray-900); margin-bottom:8px;">Hapus Data Siswa?</h4>
+        <p class="delete-confirm-text" style="font-size:13.5px; color:var(--gray-500); line-height:1.6;">
+          Anda akan menghapus data siswa
+          <strong id="hapus-nama" class="delete-confirm-name" style="color:var(--gray-900);">—</strong>.
+          <br />Tindakan ini tidak dapat dibatalkan.
+        </p>
+        <div class="delete-confirm-warning"
+          style="margin-top:14px; padding:10px 14px; background:var(--warning-light); border-radius:var(--radius-md); font-size:12.5px; color:var(--warning); display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Riwayat pelanggaran siswa ini juga akan ikut terhapus.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal-close>
+          <i class="fa-solid fa-xmark"></i> Batal
+        </button>
+        <button class="btn btn-danger" id="btn-confirm-hapus">
+          <i class="fa-solid fa-trash"></i> Ya, Hapus
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL KONFIRMASI KELUAR ════════════════════════════════ -->
+  <div id="modalKeluarOverlay" style="
+    position:fixed; inset:0;
+    background:rgba(15,23,42,0.65);
+    z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+    backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none;
+    transition:opacity 250ms cubic-bezier(0.4,0,0.2,1);">
+
+    <div id="modal-keluar-content" style="
+      background:#ffffff;
+      border-radius:24px;
+      width:100%; max-width:360px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25), 0 8px 16px rgba(0,0,0,0.1);
+      text-align:center;
+      transform:scale(0.95) translateY(16px);
+      transition:transform 250ms cubic-bezier(0.4,0,0.2,1);
+      overflow:hidden;">
+
+      <div style="padding:36px 28px 24px;">
+        <div style="
+          width:80px; height:80px; border-radius:50%;
+          background:#dc2626;
+          display:flex; align-items:center; justify-content:center;
+          margin:0 auto 20px;
+          box-shadow:0 8px 24px rgba(220,38,38,0.35);">
+          <i class="fa-solid fa-right-from-bracket" style="color:#fff;font-size:28px;"></i>
+        </div>
+        <h5 id="modal-keluar-title" style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">
+          Konfirmasi Keluar
+        </h5>
+        <p id="modal-keluar-desc" style="font-size:14px;color:#64748b;margin:0;line-height:1.6;">
+          Apakah Anda yakin ingin keluar dari aplikasi SIGAP?
+        </p>
+      </div>
+
+      <div id="modal-keluar-footer" style="
+        display:flex; gap:10px;
+        padding:16px 24px;
+        border-top:1px solid #f1f5f9;
+        background:#f8fafc;">
+        <button type="button" id="btn-batal-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:1.5px solid #e2e8f0; background:#ffffff; color:#475569;
+          transition:background 150ms ease;">
+          Batal
+        </button>
+        <button type="button" id="btn-konfirmasi-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:none; background:#dc2626; color:#ffffff;
+          transition:background 150ms ease;">
+          Ya, Keluar
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- ════════════════════════════════════════════════════════════ -->
+
+  <style>
+    #modalKeluarOverlay.active {
+      opacity: 1 !important;
+      pointer-events: all !important;
+    }
+
+    #modalKeluarOverlay.active #modal-keluar-content {
+      transform: scale(1) translateY(0) !important;
+    }
+
+    #btn-batal-keluar:hover {
+      background: #f1f5f9 !important;
+    }
+
+    #btn-konfirmasi-keluar:hover {
+      background: #b91c1c !important;
+    }
+
+    html.dark #modal-keluar-content {
+      background: #1e293b !important;
+    }
+
+    html.dark #modal-keluar-title {
+      color: #f1f5f9 !important;
+    }
+
+    html.dark #modal-keluar-desc {
+      color: #94a3b8 !important;
+    }
+
+    html.dark #modal-keluar-footer {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    html.dark #btn-batal-keluar {
+      background: #334155 !important;
+      border-color: #475569 !important;
+      color: #94a3b8 !important;
+    }
+
+    html.dark #btn-batal-keluar:hover {
+      background: #3f546e !important;
+      color: #e2e8f0 !important;
+    }
+  </style>
+
+  <script src="../assets/js/api.js"></script>
+  <script>
+    /* ============================================================
+       DATA-SISWA.JS (API VERSION)
+       ============================================================ */
+
+    // ── Auth & layout ─────────────────────────────────────────
+    const currentUser = requireAuth();
+    initLayout('Data Siswa');
+
+    // ── Local state (global agar bisa diakses onclick) ────────
+    let editingId = null;
+    let deletingId = null;
+    let siswaCurrentPage = 1;
+    const SISWA_PER_PAGE = 8;
+
+    // Fill user info
+    (function () {
+      const u = currentUser;
+      if (!u) return;
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+      const roleLabelMap = { admin: 'Administrator', guru_bk: 'Guru BK', wali_kelas: 'Wali Kelas' };
+      const initials = u.avatar || (u.nama ? u.nama.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?');
+      setEl('sb-username', u.nama);
+      setEl('topbar-username', u.nama);
+      setEl('sb-avatar', initials);
+      setEl('topbar-avatar', initials);
+      setEl('sb-role', roleLabelMap[u.role] || u.role);
+    })();
+
+    // ── Init Modals ───────────────────────────────────────────
+    initModals();
+
+    // ── Populate class dropdown (tetap: X, XI, XII) ────────────
+    async function loadKelasOptions() {
+      // Kelas disederhanakan jadi tingkat saja (X/XI/XII); jurusan sudah
+      // tercatat terpisah lewat tabel jurusan, jadi daftar ini statis.
+      const kelasList = ['X', 'XI', 'XII'];
+
+      // Filter dropdown
+      const str = '<option value="">Semua Kelas</option>' +
+        kelasList.map(k => `<option value="${k}">${k}</option>`).join('');
+      document.getElementById('filter-kelas').innerHTML = str;
+
+      // Modal Form dropdown
+      const str2 = '<option value="">-- Pilih Kelas --</option>' +
+        kelasList.map(k => `<option value="${k}">${k}</option>`).join('');
+      document.getElementById('f-kelas').innerHTML = str2;
+    }
+
+    // Escape teks sebelum disisipkan ke innerHTML
+    function escJurusan(text) {
+      return String(text ?? '').replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+      ));
+    }
+
+    // -- Populate jurusan dropdown (dari tabel jurusan) --------
+    async function loadJurusanOptions() {
+      const res = await apiRequest('../api/siswa.php?action=jurusan');
+      const list = (res && res.success && Array.isArray(res.data)) ? res.data : [];
+      const sel = document.getElementById('filter-jurusan');
+      sel.innerHTML = '';
+      sel.add(new Option('Semua Jurusan', ''));
+      list.forEach(j => sel.add(new Option(`${j.kode} — ${j.nama}`, j.kode)));
+
+      // Dropdown jurusan di modal edit
+      const fj = document.getElementById('f-jurusan');
+      fj.innerHTML = '<option value="">-- Pilih Jurusan --</option>';
+      list.forEach(j => fj.add(new Option(`${j.kode} — ${j.nama}`, j.kode)));
+    }
+
+    // ── Helpers ───────────────────────────────────────────────
+    function getAvatarClass(idx) {
+      return `av-${idx % 12}`;
+    }
+
+    function getInitials(nama) {
+      if (!nama || typeof nama !== 'string') return '?';
+      const parts = nama.trim().split(' ').filter(Boolean);
+      if (parts.length === 0) return '?';
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function highlightText(text, query) {
+      if (!query || !text) return text;
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.toString().replace(regex, '<mark class="highlight">$1</mark>');
+    }
+
+    // ── Stats bar ─────────────────────────────────────────────
+    function updateSiswaStats(pagination) {
+      if (!pagination) return;
+      const total = pagination.total || 0;
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('total-count').textContent = total;
+      // showing-count diupdate di renderSiswaTable berdasarkan data aktual halaman ini
+    }
+
+    // Hitung statistik gender & kelas dari data yang sedang ditampilkan
+    function updateStatsFromData(data) {
+      const laki = data.filter(s => s.gender === 'L').length;
+      const perempuan = data.filter(s => s.gender === 'P').length;
+      const kelasSet = new Set(data.map(s => s.kelas).filter(Boolean));
+      const waCount = data.filter(s => s.wa_ortu).length;
+
+      document.getElementById('stat-laki').textContent = laki;
+      document.getElementById('stat-perempuan').textContent = perempuan;
+      document.getElementById('stat-kelas').textContent = kelasSet.size;
+      document.getElementById('stat-wa').textContent = waCount;
+      document.getElementById('showing-count').textContent = data.length;
+    }
+
+    // ── Filter & search ───────────────────────────────────────
+    function applyFilter() {
+      siswaCurrentPage = 1;
+      loadSiswa();
+    }
+
+    document.getElementById('search-input').addEventListener('input', applyFilter);
+    document.getElementById('filter-jurusan').addEventListener('change', applyFilter);
+    document.getElementById('filter-kelas').addEventListener('change', applyFilter);
+    document.getElementById('filter-gender').addEventListener('change', applyFilter);
+    document.getElementById('btn-reset-filter').addEventListener('click', () => {
+      document.getElementById('search-input').value = '';
+      document.getElementById('filter-jurusan').value = '';
+      document.getElementById('filter-kelas').value = '';
+      document.getElementById('filter-gender').value = '';
+      applyFilter();
+    });
+
+    // ── Load Siswa List ───────────────────────────────────────
+    async function loadSiswa() {
+      const tbody = document.getElementById('siswa-tbody');
+      tbody.innerHTML = '<tr><td colspan="7"><div style="text-align:center;padding:30px;"><span class="btn-spinner" style="display:inline-block; border-color:var(--primary); border-top-color:transparent; width:20px; height:20px; margin-bottom:10px;"></span><br>Memuat data...</div></td></tr>';
+
+      const q = document.getElementById('search-input').value.trim();
+      const kelas = document.getElementById('filter-kelas').value;
+      const gender = document.getElementById('filter-gender').value;
+      const jurusan = document.getElementById('filter-jurusan').value;
+
+      const params = new URLSearchParams({
+        page: siswaCurrentPage,
+        limit: SISWA_PER_PAGE,
+      });
+      if (q) params.append('q', q);
+      if (kelas) params.append('kelas', kelas);
+      if (gender) params.append('gender', gender);
+      if (jurusan) params.append('jurusan', jurusan);
+
+      const res = await apiRequest(`../api/siswa.php?${params.toString()}`);
+
+      if (!res || !res.success) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><h4>Gagal memuat data</h4><p>Pastikan server berjalan dengan baik.</p></div></td></tr>`;
+        return;
+      }
+
+      renderSiswaTable(res.data, res.meta?.pagination, q);
+      updateSiswaStats(res.meta?.pagination);
+    }
+
+    // ── Render table ──────────────────────────────────────────
+    function renderSiswaTable(data, pagination, query) {
+      const tbody = document.getElementById('siswa-tbody');
+
+      if (data.length === 0) {
+        tbody.innerHTML = `
+      <tr class="table-empty-row">
+        <td colspan="7">
+          <div class="empty-state">
+            <i class="fa-solid fa-users-slash"></i>
+            <h4>Tidak ada data siswa</h4>
+            <p>${query ? `Tidak ditemukan siswa dengan kata kunci "<strong>${query}</strong>"` : 'Belum ada siswa yang terdaftar. Klik "Tambah Siswa" untuk menambah.'}</p>
+          </div>
+        </td>
+      </tr>`;
+        renderPaginationControls(document.getElementById('pagination-controls'), { currentPage: 1, totalPages: 1 }, () => { });
+        return;
+      }
+
+      document.getElementById('page-current').textContent = pagination.current_page;
+      document.getElementById('page-total').textContent = pagination.total_pages;
+
+      let start = (pagination.current_page - 1) * pagination.per_page;
+
+      tbody.innerHTML = data.map((s, i) => {
+        const globalIdx = start + i + 1;
+        const avClass = getAvatarClass(globalIdx);
+        const initials = getInitials(s.nama);
+        const hlNama = highlightText(s.nama, query);
+        const hlNis = highlightText(s.nis, query);
+        const hlKelas = highlightText(s.kelas, query);
+
+        const genderBadge = s.gender === 'L'
+          ? '<span class="gender-badge L" title="Laki-laki"><i class="fa-solid fa-mars" style="font-size:9px;"></i></span>'
+          : '<span class="gender-badge P" title="Perempuan"><i class="fa-solid fa-venus" style="font-size:9px;"></i></span>';
+
+        const waFormatted = s.wa_ortu
+          ? s.wa_ortu.replace(/(\d{4})(\d{4})(\d+)/, '$1-$2-$3')
+          : '—';
+
+        // we assume API joins violation_count
+        const vCount = parseInt(s.total_pelanggaran || 0);
+        const violBadge = vCount > 0
+          ? `<span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> ${vCount}x</span>`
+          : `<span class="badge badge-success"><i class="fa-solid fa-check"></i> Bersih</span>`;
+
+        return `
+      <tr data-id="${s.id}">
+        <td data-label="No" style="font-size:12px; color:var(--gray-400); font-family:var(--font-mono); text-align:center;">${globalIdx}</td>
+        <td data-label="Nama Siswa">
+          <div class="student-row-info">
+            <div class="student-avatar ${avClass}">${initials}</div>
+            <div class="student-name-block">
+              <span class="s-name">${hlNama}</span>
+              <span class="s-nis">${hlNis}</span>
+            </div>
+          </div>
+        </td>
+        <td data-label="NIS">
+          <span style="font-family:var(--font-mono); font-size:13px; color:var(--gray-600);">${hlNis}</span>
+        </td>
+        <td data-label="Kelas">
+          <div style="display:flex; align-items:center; gap:6px;">
+            ${genderBadge}
+            <span class="badge badge-primary" style="font-size:11.5px;">${hlKelas}</span>
+            ${s.jurusan_kode ? `<span class="badge" title="${escJurusan(s.jurusan_nama)}" style="font-size:11px;background:var(--gray-100);color:var(--gray-600);">${escJurusan(s.jurusan_kode)}</span>` : ''}
+          </div>
+        </td>
+        <td data-label="No. WA Orang Tua">
+          <div class="wa-number">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>${waFormatted}</span>
+          </div>
+        </td>
+        <td data-label="Pelanggaran">${violBadge}</td>
+        <td data-label="Aksi">
+          <div class="action-group">
+            <button class="btn-action btn-action-view" onclick="loadSiswaDetail('${s.id}')" title="Lihat detail">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <button class="btn-action btn-action-edit" onclick="handleEdit('${s.id}')" title="Edit data">
+              <i class="fa-solid fa-pen-to-square"></i> Edit
+            </button>
+            <button class="btn-action btn-action-delete" onclick="handleHapus('${s.id}', '${s.nama.replace(/'/g, "\\'")}')" title="Hapus siswa">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+      }).join('');
+
+      updateStatsFromData(data);
+
+      renderPaginationControls(
+        document.getElementById('pagination-controls'),
+        { currentPage: pagination.current_page, totalPages: pagination.total_pages },
+        (newPage) => {
+          siswaCurrentPage = newPage;
+          loadSiswa();
+        }
+      );
+    }
+
+    function renderPaginationControls(container, pagi, onChange) {
+      container.innerHTML = '';
+      const totalPg = pagi.totalPages;
+      const curPg = pagi.currentPage;
+
+      const addBtn = (label, page, disabled, active) => {
+        const btn = document.createElement('button');
+        btn.className = `page-btn${active ? ' active' : ''}`;
+        btn.innerHTML = label;
+        btn.disabled = disabled;
+        btn.addEventListener('click', () => { if (!disabled && !active) onChange(page); });
+        container.appendChild(btn);
+      };
+
+      addBtn('<i class="fa-solid fa-chevron-left" style="font-size:10px"></i>', curPg - 1, curPg <= 1, false);
+
+      let startPg = Math.max(1, curPg - 2);
+      let endPg = Math.min(totalPg, startPg + 4);
+      if (endPg - startPg < 4) startPg = Math.max(1, endPg - 4);
+
+      if (startPg > 1) {
+        addBtn('1', 1, false, false);
+        if (startPg > 2) addBtn('…', null, true, false);
+      }
+
+      for (let i = startPg; i <= endPg; i++) {
+        addBtn(i, i, false, i === curPg);
+      }
+
+      if (endPg < totalPg) {
+        if (endPg < totalPg - 1) addBtn('…', null, true, false);
+        addBtn(totalPg, totalPg, false, false);
+      }
+
+      addBtn('<i class="fa-solid fa-chevron-right" style="font-size:10px"></i>', curPg + 1, curPg >= totalPg, false);
+    }
+
+    // ── Load Detail ───────────────────────────────────────────
+    async function loadSiswaDetail(id) {
+      try {
+        const res = await apiRequest(`../api/siswa.php?action=detail&id=${id}`);
+        if (!res || !res.success) {
+          if (typeof showToast === 'function') showToast({ type: 'danger', title: 'Gagal Memuat', message: res?.message || 'Data siswa tidak ditemukan.' });
+          return;
+        }
+        const s = res.data;
+        if (!s || typeof s !== 'object' || Array.isArray(s)) {
+          console.error('loadSiswaDetail: data tidak valid', s);
+          if (typeof showToast === 'function') showToast({ type: 'danger', title: 'Error', message: 'Response API tidak valid.' });
+          return;
+        }
+
+        const avClass = getAvatarClass(1); // placeholder
+        const initials = getInitials(s.nama);
+
+        const avEl = document.getElementById('detail-avatar');
+        avEl.className = `student-avatar ${avClass}`;
+        avEl.style.cssText = 'width:56px;height:56px;font-size:18px;';
+        avEl.textContent = initials;
+
+        document.getElementById('detail-nama').textContent = s.nama;
+        document.getElementById('detail-kelas').textContent = s.kelas;
+        document.getElementById('detail-nis').textContent = s.nis;
+
+        const gBadge = document.getElementById('detail-gender-badge');
+        gBadge.className = `gender-badge ${s.gender}`;
+        gBadge.innerHTML = s.gender === 'L'
+          ? '<i class="fa-solid fa-mars" style="font-size:9px;"></i>'
+          : '<i class="fa-solid fa-venus" style="font-size:9px;"></i>';
+
+        const violations = s.riwayat_pelanggaran || s.pelanggaran || [];
+        document.getElementById('detail-violation-count').innerHTML =
+          `<i class="fa-solid fa-triangle-exclamation"></i> ${violations.length} Pelanggaran`;
+
+        document.getElementById('d-nis').textContent = s.nis;
+        document.getElementById('d-kelas').textContent = s.kelas;
+        document.getElementById('d-gender').textContent = s.gender === 'L' ? 'Laki-laki' : 'Perempuan';
+        document.getElementById('d-alamat').textContent = s.alamat || '—';
+        document.getElementById('d-ortu').textContent = s.nama_ortu || '—';
+        document.getElementById('d-wa').innerHTML = s.wa_ortu
+          ? `<a href="https://wa.me/62${s.wa_ortu.replace(/^0/, '')}" class="wa-link" target="_blank"><i class="fa-brands fa-whatsapp"></i> ${s.wa_ortu}</a>`
+          : '—';
+
+        // Persentase pelanggaran siswa
+        // API mengembalikan: s.persentase (0–100), s.poin (total_poin), s.jumlah_pelanggaran
+        const persentase = typeof s.persentase === 'number' ? s.persentase : 0;
+        const totalPoin = typeof s.poin === 'number' ? s.poin : 0;
+        const jumlahPel = typeof s.jumlah_pelanggaran === 'number' ? s.jumlah_pelanggaran : 0;
+        const poinEl = document.getElementById('detail-poin-val');
+        const poinBar = document.getElementById('detail-poin-bar');
+        const poinBadge = document.getElementById('detail-poin-badge');
+        const poinLabelEl = document.getElementById('detail-poin-label');
+
+        if (poinEl) poinEl.textContent = Math.round(persentase) + '%';
+
+        if (poinBar) {
+          poinBar.style.width = Math.min(100, persentase) + '%';
+
+          // Warna: makin tinggi persentase → makin merah (makin banyak pelanggaran berat)
+          let warna, label;
+          if (persentase === 0) {
+            warna = 'var(--success)'; label = 'Bersih';
+          } else if (persentase < 34) {
+            warna = 'var(--success)'; label = 'Ringan';
+          } else if (persentase < 67) {
+            warna = '#d97706'; label = 'Sedang';
+          } else {
+            warna = 'var(--danger)'; label = 'Berat';
+          }
+
+          poinBar.style.background = warna;
+          if (poinBadge) poinBadge.style.color = warna;
+          if (poinLabelEl) {
+            poinLabelEl.textContent = label;
+            poinLabelEl.style.color = warna;
+          }
+        }
+
+        // Tooltip info detail poin
+        const poinWrap = document.getElementById('detail-poin-wrap');
+        if (poinWrap && jumlahPel > 0) {
+          poinWrap.title = `Total: ${totalPoin} poin dari ${jumlahPel} pelanggaran\nMaksimal: ${jumlahPel * 3} poin\nPersentase: ${persentase.toFixed(2)}%`;
+        }
+
+        const vlEl = document.getElementById('detail-violations');
+        if (violations.length === 0) {
+          vlEl.innerHTML = `
+      <div style="text-align:center; padding:16px; color:var(--gray-400); font-size:13px;">
+        <i class="fa-solid fa-circle-check" style="color:var(--success); font-size:20px; display:block; margin-bottom:6px;"></i>
+        Tidak ada riwayat pelanggaran
+      </div>`;
+        } else {
+          const getWABadgeMini = (status) => {
+            const map = {
+              'Terkirim': '<span class="badge badge-success" style="font-size:10px;"><i class="fa-solid fa-check"></i></span>',
+              'Pending': '<span class="badge badge-warning" style="font-size:10px;"><i class="fa-solid fa-clock"></i></span>',
+              'Gagal': '<span class="badge badge-danger"  style="font-size:10px;"><i class="fa-solid fa-xmark"></i></span>',
+            };
+            return map[status] || '';
+          };
+
+          vlEl.innerHTML = violations.slice(0, 5).map(v => `
+      <div class="mini-violation-item">
+        <div>
+          <span class="mv-jenis">${v.nama_jenis}</span>
+          <span class="mv-date" style="margin-left:8px;">${formatTanggal(v.tanggal)}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          ${v.poin ? `<span style="font-size:11px; font-weight:700; color:var(--danger); background:rgba(220,38,38,0.08); padding:2px 7px; border-radius:99px;">+${v.poin} poin</span>` : ''}
+          ${getWABadgeMini(v.status_wa)}
+        </div>
+      </div>`).join('');
+
+          if (violations.length > 5) {
+            vlEl.innerHTML += `
+        <div style="text-align:center; font-size:12px; color:var(--primary); padding:4px;">
+          +${violations.length - 5} pelanggaran lainnya —
+          <a href="riwayat.html" style="color:var(--primary); font-weight:600;">Lihat semua</a>
+        </div>`;
+          }
+        }
+
+        openModal('modal-detail');
+      } catch (err) { console.error('loadSiswaDetail error:', err); }
+    }
+
+    // ── Edit modal ────────────────────────────────────────────
+    async function handleEdit(id) {
+      editingId = id;
+      const res = await apiRequest(`../api/siswa.php?action=detail&id=${id}`);
+      if (!res || !res.success) {
+        if (typeof showToast === 'function') showToast({ type: 'danger', title: 'Gagal', message: res?.message || 'Data tidak ditemukan.' });
+        return;
+      }
+      const s = res.data;
+      if (!s || typeof s !== 'object' || Array.isArray(s)) return;
+
+      document.getElementById('modal-form-title').textContent = 'Edit Data Siswa';
+      document.getElementById('modal-form-icon').className = 'fa-solid fa-pen-to-square';
+      document.getElementById('btn-simpan').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan';
+
+      document.getElementById('f-nama').value = s.nama;
+      document.getElementById('f-nis').value = s.nis;
+      // Kelas disimpan sebagai tingkat (X/XI/XII); data lama "XII TKJ 1" → "XII"
+      document.getElementById('f-kelas').value = String(s.kelas || '').trim().split(/\s+/)[0].toUpperCase();
+      document.getElementById('f-jurusan').value = s.jurusan_kode || '';
+      document.getElementById('f-gender').value = s.gender;
+      document.getElementById('f-alamat').value = s.alamat || '';
+      document.getElementById('f-nama-ortu').value = s.nama_ortu || '';
+      // Format WA: hilangkan prefix 62/0 agar field isi angka murni (misal 81234567)
+      let waDisplay = s.wa_ortu || '';
+      waDisplay = waDisplay.replace(/^62/, '').replace(/^0/, '');
+      document.getElementById('f-wa').value = waDisplay;
+
+      clearFormErrors();
+      openModal('modal-form');
+      document.getElementById('f-nama').focus();
+    }
+
+    // ── Form validation & save ────────────────────────────────
+    function clearFormErrors() {
+      ['f-nama', 'f-nis', 'f-kelas', 'f-jurusan', 'f-gender', 'f-wa'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('is-invalid');
+      });
+      ['err-nama', 'err-nis', 'err-kelas', 'err-jurusan', 'err-gender', 'err-wa'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
+
+    function showFieldError(fieldId, errId, msg) {
+      const field = document.getElementById(fieldId);
+      const err = document.getElementById(errId);
+      if (field) field.classList.add('is-invalid');
+      if (err) { err.textContent = msg; err.style.display = 'block'; }
+    }
+
+    document.getElementById('btn-simpan').addEventListener('click', async () => {
+      clearFormErrors();
+
+      const inputs = {
+        action: editingId ? 'edit' : 'tambah',
+        id: editingId || '',
+        nama: document.getElementById('f-nama').value.trim(),
+        nis: document.getElementById('f-nis').value.trim(),
+        kelas: document.getElementById('f-kelas').value,
+        jurusan: document.getElementById('f-jurusan').value,
+        gender: document.getElementById('f-gender').value,
+        alamat: document.getElementById('f-alamat').value.trim(),
+        nama_ortu: document.getElementById('f-nama-ortu').value.trim(),
+        wa_ortu: document.getElementById('f-wa').value.trim()
+      };
+
+      let valid = true;
+      if (!inputs.nama) { showFieldError('f-nama', 'err-nama', 'Nama harus diisi.'); valid = false; }
+      if (!inputs.nis) { showFieldError('f-nis', 'err-nis', 'NIS wajib diisi.'); valid = false; }
+      if (!inputs.kelas) { showFieldError('f-kelas', 'err-kelas', 'Pilih kelas.'); valid = false; }
+      if (!inputs.jurusan) { showFieldError('f-jurusan', 'err-jurusan', 'Pilih jurusan.'); valid = false; }
+      if (!inputs.gender) { showFieldError('f-gender', 'err-gender', 'Pilih jenis kelamin.'); valid = false; }
+      if (!inputs.wa_ortu) {
+        showFieldError('f-wa', 'err-wa', 'Nomor WA wajib diisi.'); valid = false;
+      } else if (!/^[0-9\-]{8,14}$/.test(inputs.wa_ortu)) {
+        showFieldError('f-wa', 'err-wa', 'Format nomor tidak valid.'); valid = false;
+      }
+      if (!valid) return;
+
+      const btn = document.getElementById('btn-simpan');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner" style="display:inline-block;"></span> Menyimpan...';
+
+      inputs.wa_ortu = '0' + inputs.wa_ortu.replace(/\D/g, ''); // strip non-digits lalu prepend 0
+
+      const res = await apiRequest('../api/siswa.php', {
+        method: 'POST',
+        body: toFormData(inputs)
+      });
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Data';
+
+      if (res && res.success) {
+        showToast({ type: 'success', title: editingId ? 'Data Diperbarui' : 'Siswa Ditambahkan', message: res.message });
+        closeModal('modal-form');
+        editingId = null;
+        loadKelasOptions();
+        loadSiswa();
+      } else {
+        const errors = res?.errors || {};
+        // Highlight field error dari API
+        if (errors.nama) showFieldError('f-nama', 'err-nama', errors.nama);
+        if (errors.nis) showFieldError('f-nis', 'err-nis', errors.nis);
+        if (errors.kelas) showFieldError('f-kelas', 'err-kelas', errors.kelas);
+        if (errors.jurusan) showFieldError('f-jurusan', 'err-jurusan', errors.jurusan);
+        if (errors.gender) showFieldError('f-gender', 'err-gender', errors.gender);
+        if (errors.wa_ortu) showFieldError('f-wa', 'err-wa', errors.wa_ortu);
+        showToast({ type: 'danger', title: 'Gagal Menyimpan', message: res?.message || 'Server tidak merespons dengan benar. Periksa koneksi server dan database.' });
+      }
+    });
+
+    // ── Hapus ─────────────────────────────────────────────────
+    function handleHapus(id, nama) {
+      deletingId = id;
+      document.getElementById('hapus-nama').textContent = nama || ('ID: ' + id);
+      openModal('modal-hapus');
+    }
+
+    document.getElementById('btn-confirm-hapus').addEventListener('click', async function () {
+      if (!deletingId) return;
+      const btn = this;
+      const label = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner" style="display:inline-block;"></span> Menghapus...';
+
+      const res = await apiRequest('../api/siswa.php', {
+        method: 'POST',
+        body: toFormData({ action: 'hapus', id: deletingId })
+      });
+
+      btn.disabled = false;
+      btn.innerHTML = label;
+
+      if (res && res.success) {
+        showToast({ type: 'success', title: 'Terhapus', message: res.message });
+        closeModal('modal-hapus');
+        deletingId = null;
+        loadKelasOptions();
+        loadSiswa();
+      } else {
+        showToast({ type: 'danger', title: 'Gagal Menghapus', message: res?.message || 'Data tidak dapat dihapus. Periksa koneksi server dan database.' });
+      }
+    });
+
+    // ── Keyboard & Formatting ─────────────────────────────────
+    document.getElementById('search-input').addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.getElementById('search-input').value = '';
+        applyFilter();
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+      }
+    });
+
+    document.getElementById('f-wa').addEventListener('input', function () {
+      this.value = this.value.replace(/[^0-9\-]/g, '');
+    });
+
+    document.getElementById('f-nis').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, ''); // strip non-digits
+    });
+
+    // ── Date display ─────────────────────────────────────────
+    (function () {
+      const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const now = new Date();
+      const str = `${HARI[now.getDay()]}, ${now.getDate()} ${BULAN[now.getMonth()]} ${now.getFullYear()}`;
+      const el = document.getElementById('date-display');
+      if (el) el.textContent = str;
+    })();
+
+    // ── Dark Mode ─────────────────────────────────────────────
+    (function () {
+      const html = document.documentElement;
+      const STORAGE = 'sigap_darkmode';
+
+      if (localStorage.getItem(STORAGE) === '1') {
+        html.classList.add('dark');
+      }
+
+      function setDark(on) {
+        html.classList.add('dark-transitioning');
+        setTimeout(() => html.classList.remove('dark-transitioning'), 300);
+        if (on) {
+          html.classList.add('dark');
+          localStorage.setItem(STORAGE, '1');
+        } else {
+          html.classList.remove('dark');
+          localStorage.setItem(STORAGE, '0');
+        }
+        updateIcon();
+      }
+
+      function updateIcon() {
+        const isDark = html.classList.contains('dark');
+        const icon = document.getElementById('dm-icon');
+        const btn = document.getElementById('btn-darkmode');
+        if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        if (btn) btn.title = isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap';
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        updateIcon();
+        const btn = document.getElementById('btn-darkmode');
+        if (btn) btn.addEventListener('click', function () {
+          setDark(!html.classList.contains('dark'));
+        });
+      });
+    })();
+
+    // ── Logout confirmation ───────────────────────────────────
+    (function () {
+      const overlay = document.getElementById('modalKeluarOverlay');
+      const btnOk = document.getElementById('btn-konfirmasi-keluar');
+      const btnBatal = document.getElementById('btn-batal-keluar');
+
+      function openModal() { overlay.classList.add('active'); }
+      function closeModal() {
+        overlay.classList.remove('active');
+        btnOk.disabled = false;
+        btnOk.textContent = 'Ya, Keluar';
+      }
+
+      document.querySelectorAll('[data-logout]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openModal();
+        }, true);
+      });
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+      });
+
+      btnBatal.addEventListener('click', closeModal);
+
+      btnOk.addEventListener('click', function () {
+        btnOk.disabled = true;
+        btnOk.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" style="margin-right:6px;"></i> Keluar…';
+        setTimeout(function () {
+          closeModal();
+          localStorage.clear();
+          sessionStorage.clear();
+          if (typeof logout === 'function') { try { logout(); } catch (e) { } }
+          window.location.href = 'login.html';
+        }, 500);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+      });
+    })();
+
+    // ── Init ──────────────────────────────────────────────────
+    loadKelasOptions();
+    loadJurusanOptions();
+    loadSiswa();
+
+  </script>
+</body>
+
+</html>

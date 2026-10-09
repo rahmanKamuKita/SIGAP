@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tambah Siswa — SIGAP</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+
+    <style>
+        /* ── Page animation ─────────────────────────────────── */
+        .form-card {
+            animation: cardIn 0.4s ease both;
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Step indicator ─────────────────────────────────── */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 28px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .step-item:last-child {
+            flex: none;
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            border: 2px solid var(--gray-200);
+            background: var(--white);
+            color: var(--gray-400);
+        }
+
+        .step-circle.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(26, 79, 160, 0.12);
+        }
+
+        .step-circle.done {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12.5px;
+            color: var(--gray-400);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .step-label.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .step-label.done {
+            color: var(--success);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: var(--gray-200);
+            margin: 0 10px;
+            border-radius: 2px;
+            transition: background 0.3s ease;
+        }
+
+        .step-line.done {
+            background: var(--success);
+        }
+
+        /* ── Section title ──────────────────────────────────── */
+        .section-block {
+            margin-bottom: 28px;
+            animation: fadeSlide 0.35s ease both;
+        }
+
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .section-block-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gray-100);
+            margin-bottom: 18px;
+        }
+
+        .section-block-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            background: var(--primary-xlight);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .section-block-icon.ortu {
+            background: #ecfdf5;
+            color: var(--success);
+        }
+
+        .section-block-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .section-block-sub {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        /* ── Input with prefix ──────────────────────────────── */
+        .input-with-prefix {
+            display: flex;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all var(--transition-fast);
+        }
+
+        .input-with-prefix:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 79, 160, 0.1);
+        }
+
+        .input-with-prefix.is-invalid-group {
+            border-color: var(--danger);
+        }
+
+        .input-prefix {
+            padding: 10px 12px;
+            background: var(--gray-100);
+            border-right: 1.5px solid var(--gray-200);
+            font-size: 13px;
+            color: var(--gray-500);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .input-prefix i {
+            color: var(--wa-green);
+        }
+
+        .input-with-prefix .input-form {
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            flex: 1;
+        }
+
+        /* ── Required asterisk ──────────────────────────────── */
+        .req {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        /* ── Character counter ──────────────────────────────── */
+        .char-count {
+            font-size: 11px;
+            color: var(--gray-400);
+            text-align: right;
+            margin-top: 3px;
+        }
+
+        /* ── Preview card (live preview) ────────────────────── */
+        .preview-card {
+            position: sticky;
+            top: 100px;
+            background: var(--white);
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            animation: cardIn 0.5s 0.1s ease both;
+        }
+
+        .preview-card-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .preview-card-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        .preview-avatar-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .preview-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            background: linear-gradient(135deg, #1a4fa0, #2563c8);
+            letter-spacing: -1px;
+            transition: all 0.3s ease;
+        }
+
+        .preview-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gray-900);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .preview-nis {
+            font-size: 12px;
+            color: var(--gray-400);
+            font-family: var(--font-mono);
+            text-align: center;
+        }
+
+        .preview-badges {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .preview-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .preview-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12.5px;
+        }
+
+        .preview-info-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--gray-500);
+            flex-shrink: 0;
+        }
+
+        .preview-info-label {
+            font-size: 10.5px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-info-value {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 12.5px;
+            transition: all 0.2s ease;
+        }
+
+        .preview-info-value.empty {
+            color: var(--gray-300);
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* ── Tips box ───────────────────────────────────────── */
+        .tips-box {
+            margin-top: 16px;
+            padding: 12px 14px;
+            background: var(--primary-xlight);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--primary);
+            font-size: 12px;
+            color: var(--primary);
+            line-height: 1.6;
+        }
+
+        .tips-box i {
+            margin-right: 4px;
+        }
+
+        /* ── Action bar at bottom ───────────────────────────── */
+        .form-action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            margin: 0 -24px -24px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .form-action-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            color: var(--gray-500);
+        }
+
+        /* ── Avatar color classes ───────────────────────────── */
+        .av-0 {
+            background: linear-gradient(135deg, #1a4fa0, #2563c8) !important;
+        }
+
+        .av-1 {
+            background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+        }
+
+        .av-2 {
+            background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+        }
+
+        .av-3 {
+            background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+        }
+
+        .av-4 {
+            background: linear-gradient(135deg, #7c3aed, #8b5cf6) !important;
+        }
+
+        .av-5 {
+            background: linear-gradient(135deg, #0891b2, #22d3ee) !important;
+        }
+
+        .av-6 {
+            background: linear-gradient(135deg, #db2777, #ec4899) !important;
+        }
+
+        .av-7 {
+            background: linear-gradient(135deg, #059669, #34d399) !important;
+        }
+
+        .av-8 {
+            background: linear-gradient(135deg, #ea580c, #fb923c) !important;
+        }
+
+        .av-9 {
+            background: linear-gradient(135deg, #4f46e5, #818cf8) !important;
+        }
+
+        .av-10 {
+            background: linear-gradient(135deg, #0d9488, #2dd4bf) !important;
+        }
+
+        .av-11 {
+            background: linear-gradient(135deg, #65a30d, #a3e635) !important;
+        }
+
+        /* ── Success state overlay ──────────────────────────── */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-overlay.show {
+            display: flex;
+        }
+
+        .success-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 40px 36px;
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            animation: successPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes successPop {
+            from {
+                opacity: 0;
+                transform: scale(0.7);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--success-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            color: var(--success);
+            margin: 0 auto 20px;
+        }
+
+        .success-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 6px;
+        }
+
+        .success-sub {
+            font-size: 13.5px;
+            color: var(--gray-500);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* ── Responsive ─────────────────────────────────────── */
+        @media (max-width: 991px) {
+            .preview-col {
+                display: none;
+            }
+        }
+
+        .sidebar-user-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 10px;
+            transition: background 0.18s;
+            cursor: pointer;
+        }
+
+        .sidebar-user-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-user-arrow {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-left: auto;
+            flex-shrink: 0;
+            transition: color 0.18s, transform 0.18s;
+        }
+
+        .sidebar-user-link:hover .sidebar-user-arrow {
+            color: rgba(255, 255, 255, 0.75);
+            transform: translateX(2px);
+        }
+
+        /* ── Topbar date badge ───────────────────────────────── */
+        .topbar-date {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            color: var(--gray-500);
+            padding: 6px 12px;
+            background: var(--gray-100);
+            border-radius: var(--radius-full);
+        }
+
+        .topbar-date i {
+            font-size: 11px;
+            color: var(--primary);
+        }
+
+        /* ── Dark mode toggle button ─────────────────────────── */
+        .btn-darkmode {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .btn-darkmode:hover {
+            border-color: #1a4fa0;
+            color: #1a4fa0;
+            background: #eff6ff;
+        }
+
+        /* ════════════════════════════════════════════════════════
+           DARK MODE — TAMBAH SISWA
+        ════════════════════════════════════════════════════════ */
+
+        :root {
+            --dm-bg: #0f172a;
+            --dm-surface: #1e293b;
+            --dm-surface-2: #253348;
+            --dm-surface-3: #2d3f55;
+            --dm-border: #2e3f55;
+            --dm-border-strong: #3d5068;
+            --dm-text: #e2e8f0;
+            --dm-text-2: #94a3b8;
+            --dm-text-3: #64748b;
+            --dm-accent: #3b82f6;
+            --dm-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+            --dm-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+            --dm-sidebar: #0d1829;
+            --dm-topbar: rgba(13, 24, 41, 0.95);
+        }
+
+        html.dark-transitioning *,
+        html.dark-transitioning *::before,
+        html.dark-transitioning *::after {
+            transition:
+                background-color 0.22s ease,
+                border-color 0.22s ease,
+                color 0.18s ease,
+                box-shadow 0.22s ease !important;
+        }
+
+        /* ── Body ─────────────────────────────────────────────── */
+        html.dark body {
+            background: var(--dm-bg) !important;
+            background-image: none !important;
+            color: var(--dm-text) !important;
+        }
+
+        /* ── Sidebar ──────────────────────────────────────────── */
+        html.dark .sidebar {
+            background: var(--dm-sidebar) !important;
+            border-right: 1px solid var(--dm-border) !important;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .sidebar-brand {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .sidebar-brand-logo {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar-brand-text strong {
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .sidebar-brand-text small {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        html.dark .sidebar-brand {
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .sidebar-brand-logo {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        html.dark .sidebar-brand-text strong {
+            color: #fff !important;
+        }
+
+        html.dark .sidebar-brand-text small {
+            color: rgba(255, 255, 255, 0.35) !important;
+        }
+
+        html.dark .sidebar-nav a {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .sidebar-nav a:hover {
+            background: rgba(255, 255, 255, 0.06) !important;
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .sidebar-nav a.active {
+            background: rgba(59, 130, 246, 0.15) !important;
+            color: #60a5fa !important;
+        }
+
+        html.dark .sidebar-nav a.active::before {
+            background: #60a5fa !important;
+        }
+
+        html.dark .sidebar-section-label {
+            color: rgba(100, 116, 139, 0.7) !important;
+        }
+
+        html.dark .sidebar-divider {
+            border-color: var(--dm-border) !important;
+            background: var(--dm-border) !important;
+        }
+
+        html.dark .sidebar-footer {
+            border-top-color: var(--dm-border) !important;
+        }
+
+        html.dark .sidebar-user-info strong {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .sidebar-user-info span {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .sidebar-user-arrow {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .sidebar-user-link:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        /* ── Topbar ───────────────────────────────────────────── */
+        html.dark .topbar {
+            background: var(--dm-topbar) !important;
+            border-bottom-color: var(--dm-border) !important;
+            box-shadow: 0 1px 0 var(--dm-border), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(20px) !important;
+        }
+
+        html.dark .topbar-page-title {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .topbar-breadcrumb {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .topbar-hamburger {
+            color: var(--dm-text-2) !important;
+            background: transparent !important;
+        }
+
+        html.dark .topbar-hamburger:hover {
+            background: rgba(255, 255, 255, 0.06) !important;
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .topbar-user {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: var(--dm-border) !important;
+        }
+
+        html.dark .topbar-user:hover {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-accent) !important;
+            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.2) !important;
+        }
+
+        html.dark .topbar-user-name {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .btn-logout {
+            background: rgba(220, 38, 38, 0.12) !important;
+            border-color: rgba(220, 38, 38, 0.3) !important;
+            color: #f87171 !important;
+        }
+
+        html.dark .btn-logout:hover {
+            background: rgba(220, 38, 38, 0.22) !important;
+            border-color: #f87171 !important;
+        }
+
+        html.dark .topbar-date {
+            background: rgba(255, 255, 255, 0.06) !important;
+            color: var(--dm-text-2) !important;
+            border: 1px solid var(--dm-border) !important;
+        }
+
+        html.dark .topbar-date i {
+            color: #60a5fa !important;
+        }
+
+        html.dark .btn-darkmode {
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: var(--dm-border) !important;
+            color: #fbbf24 !important;
+        }
+
+        html.dark .btn-darkmode:hover {
+            background: rgba(251, 191, 36, 0.12) !important;
+            border-color: #fbbf24 !important;
+            color: #fcd34d !important;
+        }
+
+        /* ── Page header ──────────────────────────────────────── */
+        html.dark .page-header h2 {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .page-header h2 i {
+            color: #60a5fa !important;
+        }
+
+        html.dark .page-header p,
+        html.dark .page-subtitle {
+            color: var(--dm-text-2) !important;
+        }
+
+        /* ── Cards / form card ─────────────────────────────────── */
+        html.dark .card,
+        html.dark .form-card,
+        html.dark .preview-card {
+            background: var(--dm-surface) !important;
+            border-color: var(--dm-border) !important;
+            box-shadow: var(--dm-shadow-sm) !important;
+        }
+
+        html.dark .card-header {
+            background: var(--dm-surface-2) !important;
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .card-title {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .card-title i {
+            color: #60a5fa !important;
+        }
+
+        /* ── Step indicator ─────────────────────────────────────── */
+        html.dark .step-circle {
+            border-color: var(--dm-border-strong) !important;
+            background: var(--dm-surface-2) !important;
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .step-circle.active {
+            border-color: var(--dm-accent) !important;
+            background: var(--dm-accent) !important;
+            color: #fff !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18) !important;
+        }
+
+        html.dark .step-circle.done {
+            border-color: #22c55e !important;
+            background: #16a34a !important;
+            color: #fff !important;
+        }
+
+        html.dark .step-label {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .step-label.active {
+            color: #60a5fa !important;
+        }
+
+        html.dark .step-label.done {
+            color: #4ade80 !important;
+        }
+
+        html.dark .step-line {
+            background: var(--dm-border-strong) !important;
+        }
+
+        html.dark .step-line.done {
+            background: #16a34a !important;
+        }
+
+        /* ── Section block ──────────────────────────────────────── */
+        html.dark .section-block-header {
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .section-block-title {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .section-block-sub {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .section-block-icon {
+            background: rgba(59, 130, 246, 0.15) !important;
+            color: #60a5fa !important;
+        }
+
+        html.dark .section-block-icon.ortu {
+            background: rgba(22, 163, 74, 0.15) !important;
+            color: #4ade80 !important;
+        }
+
+        /* ── Form inputs ─────────────────────────────────────────── */
+        html.dark .form-label,
+        html.dark label {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .input-form,
+        html.dark .form-control,
+        html.dark .form-select {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-border-strong) !important;
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .input-form::placeholder,
+        html.dark .form-control::placeholder {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .input-form:focus,
+        html.dark .form-control:focus,
+        html.dark .form-select:focus {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-accent) !important;
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .input-with-prefix {
+            border-color: var(--dm-border-strong) !important;
+        }
+
+        html.dark .input-prefix {
+            background: var(--dm-surface-3) !important;
+            border-right-color: var(--dm-border-strong) !important;
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .char-count {
+            color: var(--dm-text-3) !important;
+        }
+
+        /* ── Preview card ──────────────────────────────────────── */
+        html.dark .preview-card-header {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .preview-card-header::after {
+            background: var(--dm-border) !important;
+        }
+
+        html.dark .preview-avatar-wrap {
+            border-bottom-color: var(--dm-border) !important;
+        }
+
+        html.dark .preview-name {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .preview-nis {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .preview-info-icon {
+            background: var(--dm-surface-2) !important;
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .preview-info-label {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .preview-info-value {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .preview-info-value.empty {
+            color: var(--dm-text-3) !important;
+        }
+
+        html.dark .tips-box {
+            background: rgba(59, 130, 246, 0.1) !important;
+            color: #93c5fd !important;
+            border-left-color: var(--dm-accent) !important;
+        }
+
+        /* ── Form action bar ──────────────────────────────────────── */
+        html.dark .form-action-bar {
+            background: var(--dm-surface-2) !important;
+            border-top-color: var(--dm-border) !important;
+        }
+
+        html.dark .form-action-bar-left {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .btn.btn-outline {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-border) !important;
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .btn.btn-outline:hover {
+            border-color: var(--dm-accent) !important;
+            color: #60a5fa !important;
+        }
+
+        html.dark .btn-secondary {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-border-strong) !important;
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .btn-secondary:hover {
+            background: var(--dm-surface-3) !important;
+            color: var(--dm-text) !important;
+        }
+
+        /* ── Success overlay ──────────────────────────────────────── */
+        html.dark .success-card {
+            background: var(--dm-surface) !important;
+            box-shadow: var(--dm-shadow) !important;
+        }
+
+        html.dark .success-name {
+            color: var(--dm-text) !important;
+        }
+
+        html.dark .success-sub {
+            color: var(--dm-text-2) !important;
+        }
+
+        /* ── Badges ───────────────────────────────────────────── */
+        html.dark .badge-primary {
+            background: rgba(59, 130, 246, 0.18) !important;
+            color: #93c5fd !important;
+        }
+
+        html.dark .badge-success {
+            background: rgba(34, 197, 94, 0.15) !important;
+            color: #4ade80 !important;
+        }
+
+        html.dark .badge-warning {
+            background: rgba(234, 179, 8, 0.15) !important;
+            color: #fbbf24 !important;
+        }
+
+        html.dark .badge-danger {
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #f87171 !important;
+        }
+
+        /* ── Scrollbar ────────────────────────────────────────── */
+        html.dark ::-webkit-scrollbar-track {
+            background: var(--dm-bg);
+        }
+
+        html.dark ::-webkit-scrollbar-thumb {
+            background: var(--dm-border-strong);
+            border-radius: 999px;
+        }
+
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: #4a6080;
+        }
+
+        /* ── Text helpers ──────────────────────────────────────── */
+        html.dark .text-muted {
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark small {
+            color: var(--dm-text-3) !important;
+        }
+
+        /* ── Modal konfirmasi keluar (dark) ─────────────────────── */
+        html.dark #modal-keluar-content {
+            background: #1e293b !important;
+        }
+
+        html.dark #modal-keluar-title {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark #modal-keluar-desc {
+            color: #94a3b8 !important;
+        }
+
+        html.dark #modal-keluar-footer {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark #btn-batal-keluar {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #94a3b8 !important;
+        }
+
+        html.dark #btn-batal-keluar:hover {
+            background: #3f546e !important;
+            color: #e2e8f0 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-wrapper">
+
+        <!-- Sidebar overlay -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- ═══════════════════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════════════════════ -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-logo">
+                    <img src="../assets/images/logo-sekolah.png" alt="Logo SMK Negeri 1 Masbagik"
+                        style="width:30px; height:30px; object-fit:contain;">
+                </div>
+                <div class="sidebar-brand-text">
+                    <strong>SIGAP</strong>
+                    <small id="sb-school">SMKN 1 Masbagik</small>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Menu Utama</div>
+                <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+                <a href="data-siswa.html"><i class="fa-solid fa-users"></i><span>Data Siswa</span></a>
+                <a href="input-pelanggaran.html"><i class="fa-solid fa-circle-plus"></i><span>Input
+                        Pelanggaran</span></a>
+                <a href="riwayat.html"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></a>
+                <a href="laporan.html"><i class="fa-solid fa-chart-pie"></i><span>Laporan</span></a>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-section-label">Akun</div>
+                <a href="profile.html"><i class="fa-solid fa-user-circle"></i><span>Profil Saya</span></a>
+                <a href="#" data-logout><i class="fa-solid fa-right-from-bracket"></i><span>Keluar</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-user-avatar" id="sb-avatar">—</div>
+                    <div class="sidebar-user-info">
+                        <strong id="sb-username">—</strong>
+                        <span id="sb-role">—</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═══════════════════════════════════════════════════
+       TOPBAR
+  ════════════════════════════════════════════════════ -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-hamburger" id="hamburger-btn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div>
+                    <div class="topbar-page-title" id="topbar-title">Tambah Siswa</div>
+                    <div class="topbar-breadcrumb">
+                        <i class="fa-solid fa-house" style="font-size:9px"></i>
+                        <i class="fa-solid fa-chevron-right sep" style="font-size:8px"></i>
+                        <a href="data-siswa.html" style="color:inherit; text-decoration:none;">Data Siswa</a>
+                        <i class="fa-solid fa-chevron-right sep" style="font-size:8px"></i>
+                        <span>Tambah Siswa</span>
+                    </div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-date" id="topbar-date">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span id="date-display">—</span>
+                </div>
+                <!-- Dark Mode Toggle -->
+                <button class="btn-darkmode" id="btn-darkmode" title="Ganti tema gelap/terang"
+                    aria-label="Toggle dark mode">
+                    <i class="fa-solid fa-moon" id="dm-icon"></i>
+                </button>
+                <a href="profile.html" class="topbar-user" title="Lihat Profil Saya" style="text-decoration:none;">
+                    <div class="topbar-avatar" id="topbar-avatar">—</div>
+                    <span class="topbar-user-name" id="topbar-username">—</span>
+                </a>
+                <button class="btn-logout" data-logout>
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                </button>
+            </div>
+        </header>
+
+        <!-- ═══════════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════════════ -->
+        <main class="main-content">
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h2><i class="fa-solid fa-user-plus"></i> Tambah Siswa Baru</h2>
+                    <p class="page-subtitle">Isi formulir berikut untuk mendaftarkan siswa baru ke sistem SIGAP</p>
+                </div>
+                <a href="data-siswa.html" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar
+                </a>
+            </div>
+
+            <!-- ── Step Indicator ─────────────────────────────── -->
+            <div class="step-indicator">
+                <div class="step-item">
+                    <div class="step-circle active" id="step-circle-1">1</div>
+                    <span class="step-label active" id="step-label-1">Data Siswa</span>
+                </div>
+                <div class="step-line" id="step-line-1"></div>
+                <div class="step-item">
+                    <div class="step-circle" id="step-circle-2">2</div>
+                    <span class="step-label" id="step-label-2">Data Orang Tua</span>
+                </div>
+                <div class="step-line" id="step-line-2"></div>
+                <div class="step-item">
+                    <div class="step-circle" id="step-circle-3"><i class="fa-solid fa-check"
+                            style="font-size:12px;"></i></div>
+                    <span class="step-label" id="step-label-3">Selesai</span>
+                </div>
+            </div>
+
+            <!-- ── Content Grid ───────────────────────────────── -->
+            <div class="row g-4">
+
+                <!-- Left: Form -->
+                <div class="col-lg-8">
+
+                    <!-- ═══ STEP 1: Data Siswa ═══ -->
+                    <div class="card form-card" id="step-1-card" style="padding: 24px;">
+
+                        <!-- Section: Identitas Siswa -->
+                        <div class="section-block">
+                            <div class="section-block-header">
+                                <div class="section-block-icon">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                                <div>
+                                    <div class="section-block-title">Identitas Siswa</div>
+                                    <div class="section-block-sub">Informasi dasar dan akademik siswa</div>
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-2">
+                                <div>
+                                    <label class="form-label">Nama Lengkap <span class="req">*</span></label>
+                                    <input type="text" id="f-nama" class="input-form"
+                                        placeholder="Contoh: Andi Prasetyo" maxlength="80" autocomplete="off" />
+                                    <div class="char-count"><span id="nama-count">0</span>/80</div>
+                                    <div class="form-error" id="err-nama">Nama lengkap wajib diisi.</div>
+                                </div>
+                                <div>
+                                    <label class="form-label">NIS (Nomor Induk Siswa) <span class="req">*</span></label>
+                                    <input type="text" id="f-nis" class="input-form" placeholder="Contoh: 2401001"
+                                        maxlength="10" inputmode="numeric" />
+                                    <div class="form-help">Hanya angka, maks. 10 digit</div>
+                                    <div class="form-error" id="err-nis">NIS wajib diisi.</div>
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-2" style="margin-top:14px;">
+                                <div>
+                                    <label class="form-label">Jurusan <span class="req">*</span></label>
+                                    <select id="f-jurusan" class="input-form">
+                                        <option value="">-- Pilih Jurusan --</option>
+                                    </select>
+                                    <div class="form-error" id="err-jurusan">Jurusan wajib dipilih.</div>
+                                </div>
+                                <div>
+                                    <label class="form-label">Kelas <span class="req">*</span></label>
+                                    <select id="f-kelas" class="input-form">
+                                        <option value="">-- Pilih Kelas --</option>
+                                    </select>
+                                    <div class="form-error" id="err-kelas">Kelas wajib dipilih.</div>
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-1" style="margin-top:14px;">
+                                <div>
+                                    <label class="form-label">Jenis Kelamin <span class="req">*</span></label>
+                                    <div style="display:flex; gap:10px; margin-top:4px;">
+                                        <label class="gender-option" id="opt-L">
+                                            <input type="radio" name="gender" value="L" id="radio-L" />
+                                            <span class="gender-option-box">
+                                                <i class="fa-solid fa-mars"></i>
+                                                <span>Laki-laki</span>
+                                            </span>
+                                        </label>
+                                        <label class="gender-option" id="opt-P">
+                                            <input type="radio" name="gender" value="P" id="radio-P" />
+                                            <span class="gender-option-box">
+                                                <i class="fa-solid fa-venus"></i>
+                                                <span>Perempuan</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <div class="form-error" id="err-gender">Jenis kelamin wajib dipilih.</div>
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-1" style="margin-top:14px;">
+                                <div>
+                                    <label class="form-label">Alamat Lengkap</label>
+                                    <textarea id="f-alamat" class="input-form"
+                                        placeholder="Contoh: Jl. Merdeka No. 12, Kel. Sriwedari, Kec. Banjarsari, Surakarta"
+                                        rows="3" maxlength="200" style="resize:vertical;"></textarea>
+                                    <div class="char-count"><span id="alamat-count">0</span>/200</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Action: to Step 2 -->
+                        <div class="form-action-bar">
+                            <div class="form-action-bar-left">
+                                <i class="fa-solid fa-circle-info" style="color:var(--primary);"></i>
+                                <span>Kolom bertanda <span class="req">*</span> wajib diisi</span>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <a href="data-siswa.html" class="btn btn-secondary">
+                                    <i class="fa-solid fa-xmark"></i> Batal
+                                </a>
+                                <button class="btn btn-primary" id="btn-step1-next">
+                                    Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ═══ STEP 2: Data Orang Tua ═══ -->
+                    <div class="card form-card" id="step-2-card" style="padding: 24px; display:none;">
+
+                        <div class="section-block">
+                            <div class="section-block-header">
+                                <div class="section-block-icon ortu">
+                                    <i class="fa-solid fa-people-roof"></i>
+                                </div>
+                                <div>
+                                    <div class="section-block-title">Data Orang Tua / Wali</div>
+                                    <div class="section-block-sub">Informasi kontak untuk notifikasi pelanggaran via
+                                        WhatsApp</div>
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-2">
+                                <div>
+                                    <label class="form-label">Nama Orang Tua / Wali</label>
+                                    <input type="text" id="f-nama-ortu" class="input-form"
+                                        placeholder="Contoh: Bpk. Prasetyo Utomo" maxlength="80" autocomplete="off" />
+                                    <div class="char-count"><span id="ortu-count">0</span>/80</div>
+                                </div>
+                                <div>
+                                    <label class="form-label">Hubungan dengan Siswa</label>
+                                    <select id="f-hubungan" class="input-form">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Ayah">Ayah Kandung</option>
+                                        <option value="Ibu">Ibu Kandung</option>
+                                        <option value="Wali">Wali</option>
+                                        <option value="Kakek">Kakek/Nenek</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row cols-1" style="margin-top:14px;">
+                                <div>
+                                    <label class="form-label">Nomor WhatsApp Orang Tua <span
+                                            class="req">*</span></label>
+                                    <div class="input-with-prefix" id="wa-prefix-wrap">
+                                        <div class="input-prefix">
+                                            <i class="fa-brands fa-whatsapp"></i> +62
+                                        </div>
+                                        <input type="tel" id="f-wa" class="input-form" placeholder="812-3456-7890"
+                                            maxlength="14" inputmode="numeric" />
+                                    </div>
+                                    <div class="form-help">Masukkan nomor tanpa angka 0 di depan. Contoh: 812-3456-7890
+                                    </div>
+                                    <div class="form-error" id="err-wa">Nomor WhatsApp wajib diisi.</div>
+                                </div>
+                            </div>
+
+                            <!-- WA Preview -->
+                            <div id="wa-preview"
+                                style="display:none; margin-top:12px; padding:10px 14px; background:#f0fdf4; border-radius:var(--radius-md); border:1px solid #bbf7d0; font-size:13px; color:#16a34a; display:flex; align-items:center; gap:8px;">
+                                <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i>
+                                <span>Notifikasi akan dikirim ke: <strong id="wa-full-number">—</strong></span>
+                            </div>
+
+                        </div>
+
+                        <!-- Action bar -->
+                        <div class="form-action-bar">
+                            <button class="btn btn-secondary" id="btn-step2-back">
+                                <i class="fa-solid fa-arrow-left"></i> Kembali
+                            </button>
+                            <div style="display:flex; gap:10px;">
+                                <a href="data-siswa.html" class="btn btn-secondary">
+                                    <i class="fa-solid fa-xmark"></i> Batal
+                                </a>
+                                <button class="btn btn-primary" id="btn-simpan">
+                                    <i class="fa-solid fa-floppy-disk"></i> Simpan Data Siswa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /col-lg-8 -->
+
+                <!-- Right: Live Preview -->
+                <div class="col-lg-4 preview-col">
+                    <div class="preview-card">
+                        <div class="preview-card-header">
+                            <i class="fa-solid fa-eye" style="font-size:10px;"></i>
+                            Pratinjau Data
+                        </div>
+
+                        <!-- Avatar + name -->
+                        <div class="preview-avatar-wrap">
+                            <div class="preview-avatar av-0" id="prev-avatar">?</div>
+                            <div>
+                                <div class="preview-name" id="prev-nama">Nama Siswa</div>
+                                <div class="preview-nis" id="prev-nis">NIS: —</div>
+                                <div class="preview-badges">
+                                    <span class="badge badge-primary" id="prev-kelas" style="display:none;"></span>
+                                    <span class="badge" id="prev-jurusan-badge"
+                                        style="display:none; background:var(--gray-100); color:var(--gray-600);"></span>
+                                    <span class="gender-badge L" id="prev-gender-L" style="display:none;"><i
+                                            class="fa-solid fa-mars" style="font-size:9px;"></i></span>
+                                    <span class="gender-badge P" id="prev-gender-P" style="display:none;"><i
+                                            class="fa-solid fa-venus" style="font-size:9px;"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info list -->
+                        <div class="preview-info-list">
+                            <div class="preview-info-item">
+                                <div class="preview-info-icon"><i class="fa-solid fa-chalkboard"></i></div>
+                                <div>
+                                    <div class="preview-info-label">Kelas</div>
+                                    <div class="preview-info-value empty" id="prev-kelas-val">Belum dipilih</div>
+                                </div>
+                            </div>
+                            <div class="preview-info-item">
+                                <div class="preview-info-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                                <div>
+                                    <div class="preview-info-label">Jurusan</div>
+                                    <div class="preview-info-value empty" id="prev-jurusan-val">Belum dipilih</div>
+                                </div>
+                            </div>
+                            <div class="preview-info-item">
+                                <div class="preview-info-icon"><i class="fa-solid fa-location-dot"></i></div>
+                                <div>
+                                    <div class="preview-info-label">Alamat</div>
+                                    <div class="preview-info-value empty" id="prev-alamat">Belum diisi</div>
+                                </div>
+                            </div>
+                            <div class="preview-info-item">
+                                <div class="preview-info-icon" style="background:#f0fdf4;"><i class="fa-solid fa-person"
+                                        style="color:var(--success);"></i></div>
+                                <div>
+                                    <div class="preview-info-label">Orang Tua / Wali</div>
+                                    <div class="preview-info-value empty" id="prev-ortu">Belum diisi</div>
+                                </div>
+                            </div>
+                            <div class="preview-info-item">
+                                <div class="preview-info-icon" style="background:#f0fdf4;"><i
+                                        class="fa-brands fa-whatsapp" style="color:var(--wa-green);"></i></div>
+                                <div>
+                                    <div class="preview-info-label">WhatsApp</div>
+                                    <div class="preview-info-value empty" id="prev-wa">Belum diisi</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tips -->
+                        <div class="tips-box">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <strong>Tips:</strong> Pastikan nomor WhatsApp aktif agar notifikasi pelanggaran dapat
+                            terkirim ke orang tua secara otomatis.
+                        </div>
+                    </div>
+                </div><!-- /col-lg-4 -->
+
+            </div><!-- /row -->
+
+        </main>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ═══ MODAL KONFIRMASI KELUAR ════════════════════════════════ -->
+    <div id="modalKeluarOverlay" style="
+    position:fixed; inset:0;
+    background:rgba(15,23,42,0.65);
+    z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+    backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none;
+    transition:opacity 250ms cubic-bezier(0.4,0,0.2,1);">
+
+        <div id="modal-keluar-content" style="
+      background:#ffffff;
+      border-radius:24px;
+      width:100%; max-width:360px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25), 0 8px 16px rgba(0,0,0,0.1);
+      text-align:center;
+      transform:scale(0.95) translateY(16px);
+      transition:transform 250ms cubic-bezier(0.4,0,0.2,1);
+      overflow:hidden;">
+
+            <!-- Body -->
+            <div style="padding:36px 28px 24px;">
+                <!-- Ikon bulat -->
+                <div style="
+          width:80px; height:80px; border-radius:50%;
+          background:#dc2626;
+          display:flex; align-items:center; justify-content:center;
+          margin:0 auto 20px;
+          box-shadow:0 8px 24px rgba(220,38,38,0.35);">
+                    <i class="fa-solid fa-right-from-bracket" style="color:#fff;font-size:28px;"></i>
+                </div>
+
+                <!-- Judul -->
+                <h5 id="modal-keluar-title" style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">
+                    Konfirmasi Keluar
+                </h5>
+
+                <!-- Pesan -->
+                <p id="modal-keluar-desc" style="font-size:14px;color:#64748b;margin:0;line-height:1.6;">
+                    Apakah Anda yakin ingin keluar dari aplikasi SIGAP?
+                </p>
+            </div>
+
+            <!-- Footer tombol -->
+            <div id="modal-keluar-footer" style="
+        display:flex; gap:10px;
+        padding:16px 24px;
+        border-top:1px solid #f1f5f9;
+        background:#f8fafc;">
+                <button type="button" id="btn-batal-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:1.5px solid #e2e8f0; background:#ffffff; color:#475569;
+          transition:background 150ms ease;">
+                    Batal
+                </button>
+                <button type="button" id="btn-konfirmasi-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:none; background:#dc2626; color:#ffffff;
+          transition:background 150ms ease;">
+                    Ya, Keluar
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <!-- ════════════════════════════════════════════════════════════ -->
+
+    <!-- CSS modal keluar -->
+    <style>
+        #modalKeluarOverlay.active {
+            opacity: 1 !important;
+            pointer-events: all !important;
+        }
+
+        #modalKeluarOverlay.active #modal-keluar-content {
+            transform: scale(1) translateY(0) !important;
+        }
+
+        #btn-batal-keluar:hover {
+            background: #f1f5f9 !important;
+        }
+
+        #btn-konfirmasi-keluar:hover {
+            background: #b91c1c !important;
+        }
+    </style>
+
+    <!-- ═══ Success Overlay ════════════════════════════════════ -->
+    <div class="success-overlay" id="success-overlay">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+            <div class="success-name" id="success-nama">—</div>
+            <div id="success-saved"
+                style="display:none; align-items:center; gap:6px; margin:0 auto 12px; padding:5px 12px; border-radius:999px; background:var(--success-light); color:var(--success); font-size:12px; font-weight:600;">
+                <i class="fa-solid fa-database"></i> Tersimpan di database
+            </div>
+            <div class="success-sub">
+                Siswa berhasil ditambahkan ke sistem SIGAP.<br />
+                Data akan segera tampil di halaman <strong>Data Siswa</strong>.
+            </div>
+            <div class="success-actions">
+                <button class="btn btn-secondary" id="btn-tambah-lagi">
+                    <i class="fa-solid fa-plus"></i> Tambah Lagi
+                </button>
+                <a href="data-siswa.html" class="btn btn-primary">
+                    <i class="fa-solid fa-users"></i> Lihat Data Siswa
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Inline gender option CSS ─────────────────────────── -->
+    <style>
+        .gender-option {
+            flex: 1;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .gender-option input[type="radio"] {
+            display: none;
+        }
+
+        .gender-option-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 10px 12px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-500);
+            background: var(--white);
+            transition: all var(--transition-fast);
+            user-select: none;
+        }
+
+        .gender-option input:checked+.gender-option-box {
+            border-color: var(--primary);
+            background: var(--primary-xlight);
+            color: var(--primary);
+        }
+
+        .gender-option:has(input[value="P"]) input:checked+.gender-option-box {
+            border-color: #be185d;
+            background: #fdf2f8;
+            color: #be185d;
+        }
+
+        .gender-option-box:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ── Dark mode ──────────────────────────────────────── */
+        html.dark .gender-option-box {
+            background: var(--dm-surface-2) !important;
+            border-color: var(--dm-border-strong) !important;
+            color: var(--dm-text-2) !important;
+        }
+
+        html.dark .gender-option-box:hover {
+            border-color: var(--dm-accent) !important;
+            color: #60a5fa !important;
+        }
+
+        html.dark .gender-option input:checked+.gender-option-box {
+            border-color: var(--dm-accent) !important;
+            background: rgba(59, 130, 246, 0.15) !important;
+            color: #93c5fd !important;
+        }
+
+        html.dark .gender-option:has(input[value="P"]) input:checked+.gender-option-box {
+            border-color: #ec4899 !important;
+            background: rgba(219, 39, 119, 0.15) !important;
+            color: #f9a8d4 !important;
+        }
+    </style>
+
+    <script src="../assets/js/api.js"></script>
+    <script>
+        /* ============================================================
+           TAMBAH-SISWA.JS (API VERSION)
+           ============================================================ */
+
+        // ── Auth & layout ─────────────────────────────────────────
+        const currentUser = requireAuth();
+        initLayout('Tambah Siswa');
+
+        // ── Isi sidebar & topbar dari session ─────────────────
+        (function () {
+            const u = currentUser;
+            if (!u) return;
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+            const roleLabelMap = { admin: 'Administrator', guru_bk: 'Guru BK', wali_kelas: 'Wali Kelas' };
+            const initials = u.avatar || (u.nama ? u.nama.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?');
+            setEl('sb-username', u.nama);
+            setEl('sb-role', roleLabelMap[u.role] || u.role);
+            setEl('sb-avatar', initials);
+            setEl('topbar-avatar', initials);
+            setEl('topbar-username', u.nama);
+        })();
+
+        // ── Date display ──────────────────────────────────────────
+        (function () {
+            const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const now = new Date();
+            const str = `${HARI[now.getDay()]}, ${now.getDate()} ${BULAN[now.getMonth()]} ${now.getFullYear()}`;
+            const el = document.getElementById('date-display');
+            if (el) el.textContent = str;
+        })();
+
+        // ── Dark Mode ─────────────────────────────────────────────
+        (function () {
+            const html = document.documentElement;
+            const STORAGE = 'sigap_darkmode';
+
+            if (localStorage.getItem(STORAGE) === '1') {
+                html.classList.add('dark');
+            }
+
+            function setDark(on) {
+                html.classList.add('dark-transitioning');
+                setTimeout(() => html.classList.remove('dark-transitioning'), 300);
+                if (on) {
+                    html.classList.add('dark');
+                    localStorage.setItem(STORAGE, '1');
+                } else {
+                    html.classList.remove('dark');
+                    localStorage.setItem(STORAGE, '0');
+                }
+                updateIcon();
+            }
+
+            function updateIcon() {
+                const isDark = html.classList.contains('dark');
+                const icon = document.getElementById('dm-icon');
+                const btn = document.getElementById('btn-darkmode');
+                if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+                if (btn) btn.title = isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap';
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                updateIcon();
+                const btn = document.getElementById('btn-darkmode');
+                if (btn) btn.addEventListener('click', function () {
+                    setDark(!html.classList.contains('dark'));
+                });
+            });
+        })();
+
+        // ── Logout confirmation — Custom Modal Overlay ────────────
+        (function () {
+            const overlay = document.getElementById('modalKeluarOverlay');
+            const btnOk = document.getElementById('btn-konfirmasi-keluar');
+            const btnBatal = document.getElementById('btn-batal-keluar');
+
+            function openModal() {
+                overlay.classList.add('active');
+            }
+
+            function closeModal() {
+                overlay.classList.remove('active');
+                btnOk.disabled = false;
+                btnOk.textContent = 'Ya, Keluar';
+            }
+
+            // Intercept setiap tombol [data-logout]
+            document.querySelectorAll('[data-logout]').forEach(function (el) {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    openModal();
+                }, true);
+            });
+
+            // Klik backdrop → tutup
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) closeModal();
+            });
+
+            // Tombol Batal
+            btnBatal.addEventListener('click', closeModal);
+
+            // Tombol Ya, Keluar → logout
+            btnOk.addEventListener('click', function () {
+                btnOk.disabled = true;
+                btnOk.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-1"></i> Keluar…';
+                setTimeout(function () {
+                    closeModal();
+                    // Bersihkan session
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    // Panggil fungsi logout api.js jika ada (tanpa mengandalkan redirect-nya)
+                    if (typeof logout === 'function') {
+                        try { logout(); } catch (e) { }
+                    }
+                    // Paksa redirect ke halaman login
+                    window.location.href = 'login.html';
+                }, 500);
+            });
+
+            // ESC → tutup
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+            });
+        })();
+
+        // ── Populate kelas dropdown ───────────────────────────────
+        // Kelas hanya tingkat (X/XI/XII); jurusan dipilih terpisah (sama seperti halaman Data Siswa)
+        function loadKelasOptions() {
+            const select = document.getElementById('f-kelas');
+            ['X', 'XI', 'XII'].forEach(k => select.add(new Option(k, k)));
+        }
+        loadKelasOptions();
+
+        // ── Populate jurusan dropdown (dari tabel jurusan) ────────
+        let JURUSAN_MAP = {}; // kode -> nama
+        async function loadJurusanOptions() {
+            const select = document.getElementById('f-jurusan');
+            const res = await apiRequest('api/siswa.php?action=jurusan');
+            const list = (res && res.success && Array.isArray(res.data)) ? res.data : [];
+            if (list.length === 0) {
+                select.innerHTML = '<option value="">Gagal memuat jurusan</option>';
+                return;
+            }
+            list.forEach(j => {
+                JURUSAN_MAP[j.kode] = j.nama;
+                select.add(new Option(`${j.kode} — ${j.nama}`, j.kode));
+            });
+        }
+        loadJurusanOptions();
+
+        // ── Step state ────────────────────────────────────────────
+        let currentStep = 1;
+
+        function goToStep(step) {
+            const s1 = document.getElementById('step-1-card');
+            const s2 = document.getElementById('step-2-card');
+
+            if (step === 1) {
+                s1.style.display = '';
+                s2.style.display = 'none';
+            } else {
+                s1.style.display = 'none';
+                s2.style.display = '';
+            }
+
+            currentStep = step;
+            updateStepIndicator(step);
+        }
+
+        function updateStepIndicator(step) {
+            // Circles
+            const c1 = document.getElementById('step-circle-1');
+            const c2 = document.getElementById('step-circle-2');
+            const c3 = document.getElementById('step-circle-3');
+            const l1 = document.getElementById('step-label-1');
+            const l2 = document.getElementById('step-label-2');
+            const l3 = document.getElementById('step-label-3');
+            const line1 = document.getElementById('step-line-1');
+            const line2 = document.getElementById('step-line-2');
+
+            // Reset all
+            [c1, c2, c3].forEach(el => el.className = 'step-circle');
+            [l1, l2, l3].forEach(el => el.className = 'step-label');
+            [line1, line2].forEach(el => el.className = 'step-line');
+
+            if (step === 1) {
+                c1.classList.add('active');
+                l1.classList.add('active');
+            } else if (step === 2) {
+                c1.classList.add('done');
+                c1.innerHTML = '<i class="fa-solid fa-check" style="font-size:12px;"></i>';
+                l1.classList.add('done');
+                line1.classList.add('done');
+                c2.classList.add('active');
+                l2.classList.add('active');
+            } else if (step === 3) {
+                c1.classList.add('done');
+                c1.innerHTML = '<i class="fa-solid fa-check" style="font-size:12px;"></i>';
+                c2.classList.add('done');
+                c2.innerHTML = '<i class="fa-solid fa-check" style="font-size:12px;"></i>';
+                c3.classList.add('done');
+                l1.classList.add('done');
+                l2.classList.add('done');
+                l3.classList.add('done');
+                line1.classList.add('done');
+                line2.classList.add('done');
+            }
+        }
+
+        // ── Live Preview ──────────────────────────────────────────
+        const AVATAR_CLASSES = ['av-0', 'av-1', 'av-2', 'av-3', 'av-4', 'av-5',
+            'av-6', 'av-7', 'av-8', 'av-9', 'av-10', 'av-11'];
+
+        function getInitials(nama) {
+            const parts = nama.trim().split(' ').filter(Boolean);
+            if (parts.length === 0) return '?';
+            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        function getAvatarColorIdx(nama) {
+            if (!nama) return 0;
+            let hash = 0;
+            for (let i = 0; i < nama.length; i++) hash += nama.charCodeAt(i);
+            return hash % 12;
+        }
+
+        function updatePreview() {
+            const nama = document.getElementById('f-nama').value.trim();
+            const nis = document.getElementById('f-nis').value.trim();
+            const kelas = document.getElementById('f-kelas').value;
+            const jurusan = document.getElementById('f-jurusan').value;
+            const gender = document.querySelector('input[name="gender"]:checked');
+            const alamat = document.getElementById('f-alamat').value.trim();
+            const ortu = document.getElementById('f-nama-ortu').value.trim();
+            const wa = document.getElementById('f-wa').value.trim();
+
+            // Avatar
+            const avatarEl = document.getElementById('prev-avatar');
+            avatarEl.className = 'preview-avatar ' + AVATAR_CLASSES[getAvatarColorIdx(nama)];
+            avatarEl.textContent = nama ? getInitials(nama) : '?';
+
+            // Name
+            const nameEl = document.getElementById('prev-nama');
+            nameEl.textContent = nama || 'Nama Siswa';
+            nameEl.style.color = nama ? '' : 'var(--gray-300)';
+
+            // NIS
+            const nisEl = document.getElementById('prev-nis');
+            nisEl.textContent = nis ? 'NIS: ' + nis : 'NIS: —';
+            nisEl.style.color = nis ? '' : 'var(--gray-300)';
+
+            // Kelas badge
+            const kBadge = document.getElementById('prev-kelas');
+            const kVal = document.getElementById('prev-kelas-val');
+            if (kelas) {
+                kBadge.style.display = '';
+                kBadge.textContent = kelas;
+                kVal.textContent = kelas;
+                kVal.classList.remove('empty');
+            } else {
+                kBadge.style.display = 'none';
+                kVal.textContent = 'Belum dipilih';
+                kVal.classList.add('empty');
+            }
+
+            // Jurusan
+            const jBadge = document.getElementById('prev-jurusan-badge');
+            const jVal = document.getElementById('prev-jurusan-val');
+            if (jurusan) {
+                jBadge.style.display = '';
+                jBadge.textContent = jurusan;
+                jVal.textContent = JURUSAN_MAP[jurusan] || jurusan;
+                jVal.classList.remove('empty');
+            } else {
+                jBadge.style.display = 'none';
+                jVal.textContent = 'Belum dipilih';
+                jVal.classList.add('empty');
+            }
+
+            // Gender badges
+            document.getElementById('prev-gender-L').style.display = (gender && gender.value === 'L') ? '' : 'none';
+            document.getElementById('prev-gender-P').style.display = (gender && gender.value === 'P') ? '' : 'none';
+
+            // Alamat
+            const alamatEl = document.getElementById('prev-alamat');
+            if (alamat) {
+                alamatEl.textContent = alamat.length > 50 ? alamat.substring(0, 50) + '…' : alamat;
+                alamatEl.classList.remove('empty');
+            } else {
+                alamatEl.textContent = 'Belum diisi';
+                alamatEl.classList.add('empty');
+            }
+
+            // Ortu
+            const ortuEl = document.getElementById('prev-ortu');
+            if (ortu) {
+                ortuEl.textContent = ortu;
+                ortuEl.classList.remove('empty');
+            } else {
+                ortuEl.textContent = 'Belum diisi';
+                ortuEl.classList.add('empty');
+            }
+
+            // WA
+            const waEl = document.getElementById('prev-wa');
+            if (wa) {
+                waEl.textContent = '+62 ' + wa;
+                waEl.classList.remove('empty');
+            } else {
+                waEl.textContent = 'Belum diisi';
+                waEl.classList.add('empty');
+            }
+        }
+
+        // Attach preview listeners
+        ['f-nama', 'f-nis', 'f-kelas', 'f-jurusan', 'f-alamat', 'f-nama-ortu', 'f-wa'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', updatePreview);
+        });
+        document.querySelectorAll('input[name="gender"]').forEach(el => {
+            el.addEventListener('change', updatePreview);
+        });
+        document.getElementById('f-kelas').addEventListener('change', updatePreview);
+        document.getElementById('f-jurusan').addEventListener('change', updatePreview);
+
+        // ── Character counters ────────────────────────────────────
+        function attachCharCounter(inputId, countId) {
+            const input = document.getElementById(inputId);
+            const count = document.getElementById(countId);
+            if (!input || !count) return;
+            input.addEventListener('input', () => {
+                count.textContent = input.value.length;
+                count.style.color = input.value.length >= (parseInt(input.maxLength) * 0.9)
+                    ? 'var(--warning)' : '';
+            });
+        }
+        attachCharCounter('f-nama', 'nama-count');
+        attachCharCounter('f-alamat', 'alamat-count');
+        attachCharCounter('f-nama-ortu', 'ortu-count');
+
+        // ── Input sanitize ────────────────────────────────────────
+        document.getElementById('f-nis').addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, ''); // strip non-digits
+        });
+
+        document.getElementById('f-wa').addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9\-]/g, '');
+
+            // Show WA preview
+            const raw = this.value.trim();
+            const preview = document.getElementById('wa-preview');
+            const fullNum = document.getElementById('wa-full-number');
+            if (raw.length >= 8) {
+                preview.style.display = 'flex';
+                fullNum.textContent = '+62 ' + raw;
+            } else {
+                preview.style.display = 'none';
+            }
+
+            updatePreview();
+        });
+
+        // ── Validation helpers ────────────────────────────────────
+        // Wrapper untuk clearErrors: reset semua field error di form step 1 & 2
+        function clearErrors() {
+            ['f-nama', 'f-nis', 'f-kelas', 'f-jurusan', 'f-wa'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('is-invalid');
+            });
+            ['err-nama', 'err-nis', 'err-kelas', 'err-jurusan', 'err-gender', 'err-wa'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            const wrap = document.getElementById('wa-prefix-wrap');
+            if (wrap) wrap.classList.remove('is-invalid-group');
+        }
+
+        // Gunakan validateField() dari data.js untuk field tunggal + error manual untuk gender & WA prefix
+        function showFieldError(fieldId, errId, msg) {
+            const field = document.getElementById(fieldId);
+            const err = document.getElementById(errId);
+            if (field) field.classList.add('is-invalid');
+            if (err) { err.textContent = msg; err.style.display = 'block'; }
+        }
+
+        // ── Step 1: Next ──────────────────────────────────────────
+        document.getElementById('btn-step1-next').addEventListener('click', async () => {
+            clearErrors();
+
+            const nama = document.getElementById('f-nama').value.trim();
+            const nis = document.getElementById('f-nis').value.trim();
+            const kelas = document.getElementById('f-kelas').value;
+            const jurusan = document.getElementById('f-jurusan').value;
+            const gender = document.querySelector('input[name="gender"]:checked');
+
+            let valid = true;
+
+            if (!nama) {
+                showFieldError('f-nama', 'err-nama', 'Nama lengkap wajib diisi.');
+                valid = false;
+            } else if (nama.length < 3) {
+                showFieldError('f-nama', 'err-nama', 'Nama terlalu pendek, minimal 3 karakter.');
+                valid = false;
+            }
+
+            if (!nis) {
+                showFieldError('f-nis', 'err-nis', 'NIS wajib diisi.');
+                valid = false;
+            } // Removed duplicate checking client-side since API will handle it or we can preemptively call API. Let's just let it proceed to API call.
+
+            if (!jurusan) {
+                showFieldError('f-jurusan', 'err-jurusan', 'Jurusan wajib dipilih.');
+                valid = false;
+            }
+
+            if (!kelas) {
+                showFieldError('f-kelas', 'err-kelas', 'Kelas wajib dipilih.');
+                valid = false;
+            }
+
+            if (!gender) {
+                const errEl = document.getElementById('err-gender');
+                if (errEl) { errEl.textContent = 'Jenis kelamin wajib dipilih.'; errEl.style.display = 'block'; }
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            goToStep(2);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ── Step 2: Back ──────────────────────────────────────────
+        document.getElementById('btn-step2-back').addEventListener('click', () => {
+            goToStep(1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ── Step 2: Save ──────────────────────────────────────────
+        document.getElementById('btn-simpan').addEventListener('click', async () => {
+            clearErrors();
+
+            const waRaw = document.getElementById('f-wa').value.trim();
+            let valid = true;
+
+            if (!waRaw) {
+                document.getElementById('wa-prefix-wrap').classList.add('is-invalid-group');
+                showFieldError('f-wa', 'err-wa', 'Nomor WhatsApp wajib diisi.');
+                valid = false;
+            } else if (!/^[0-9\-]{8,14}$/.test(waRaw)) {
+                document.getElementById('wa-prefix-wrap').classList.add('is-invalid-group');
+                showFieldError('f-wa', 'err-wa', 'Format nomor tidak valid. Gunakan angka saja, tanpa 0 di depan.');
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            // Loading state
+            const btn = document.getElementById('btn-simpan');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-spinner" style="display:inline-block;"></span> Menyimpan...';
+
+            const nama = document.getElementById('f-nama').value.trim();
+            const nis = document.getElementById('f-nis').value.trim();
+            const kelas = document.getElementById('f-kelas').value;
+            const jurusan = document.getElementById('f-jurusan').value;
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const alamat = document.getElementById('f-alamat').value.trim();
+            const namaOrtu = document.getElementById('f-nama-ortu').value.trim();
+            const hubungan = document.getElementById('f-hubungan').value;
+            const waNumber = '0' + waRaw.replace(/\D/g, ''); // strip non-digits, prepend 0
+
+            const inputs = {
+                action: 'tambah',
+                nama, nis, kelas, jurusan, gender, alamat,
+                nama_ortu: hubungan ? `${namaOrtu} (${hubungan})` : namaOrtu,
+                wa_ortu: waNumber,
+            };
+
+            const res = await apiRequest('api/siswa.php', {
+                method: 'POST',
+                body: toFormData(inputs)
+            });
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Data Siswa';
+
+            if (res && res.success) {
+                // Step 3 indicator
+                updateStepIndicator(3);
+
+                // Show success overlay — tampilkan bukti data sudah masuk database
+                const saved = res.data || {};
+                document.getElementById('success-nama').textContent = nama;
+                const savedInfo = document.getElementById('success-saved');
+                if (savedInfo) {
+                    savedInfo.textContent = saved.kode_siswa
+                        ? `Tersimpan di database · Kode ${saved.kode_siswa} · NIS ${saved.nis || nis}`
+                        : 'Tersimpan di database';
+                    savedInfo.style.display = 'inline-flex';
+                }
+                document.getElementById('success-overlay').classList.add('show');
+
+                if (typeof showToast === 'function') {
+                    showToast({ type: 'success', title: 'Siswa Ditambahkan', message: `Data ${nama} berhasil disimpan.`, duration: 4000 });
+                }
+            } else {
+                // Tangani error per-field dari API response
+                const errors = res?.errors || {};
+
+                // NIS duplikat → kembali ke step 1
+                if (errors.nis || res?.message?.toLowerCase().includes('nis')) {
+                    goToStep(1);
+                    showFieldError('f-nis', 'err-nis', errors.nis || res?.message);
+                }
+                // Kelas kosong
+                if (errors.kelas) {
+                    goToStep(1);
+                    showFieldError('f-kelas', 'err-kelas', errors.kelas);
+                }
+                // Jurusan
+                if (errors.jurusan) {
+                    goToStep(1);
+                    showFieldError('f-jurusan', 'err-jurusan', errors.jurusan);
+                }
+                // Nama
+                if (errors.nama) {
+                    goToStep(1);
+                    showFieldError('f-nama', 'err-nama', errors.nama);
+                }
+                // Gender
+                if (errors.gender) {
+                    goToStep(1);
+                    const errEl = document.getElementById('err-gender');
+                    if (errEl) { errEl.textContent = errors.gender; errEl.style.display = 'block'; }
+                }
+                // WA & nama_ortu → step 2
+                if (errors.wa_ortu) {
+                    goToStep(2);
+                    document.getElementById('wa-prefix-wrap')?.classList.add('is-invalid-group');
+                    showFieldError('f-wa', 'err-wa', errors.wa_ortu);
+                }
+
+                // Toast error umum
+                const errMsg = res?.message || 'Server tidak merespons dengan benar. Pastikan XAMPP/Apache & MySQL berjalan dan file api/siswa.php terpasang.';
+                if (typeof showToast === 'function') {
+                    showToast({ type: 'danger', title: 'Gagal Menyimpan', message: errMsg, duration: 5000 });
+                } else {
+                    alert('Gagal: ' + errMsg);
+                }
+            }
+        });
+
+        // ── Tambah lagi button ────────────────────────────────────
+        document.getElementById('btn-tambah-lagi').addEventListener('click', () => {
+            // Reset form
+            ['f-nama', 'f-nis', 'f-kelas', 'f-jurusan', 'f-alamat', 'f-nama-ortu', 'f-wa', 'f-hubungan'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            document.querySelectorAll('input[name="gender"]').forEach(el => el.checked = false);
+            ['nama-count', 'alamat-count', 'ortu-count'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '0';
+            });
+            document.getElementById('wa-preview').style.display = 'none';
+            document.getElementById('success-overlay').classList.remove('show');
+            clearErrors();
+            goToStep(1);
+            updatePreview();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ── Init ──────────────────────────────────────────────────
+        updatePreview();
+    </script>
+</body>
+
+</html>

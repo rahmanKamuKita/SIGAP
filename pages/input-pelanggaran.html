@@ -1,0 +1,3705 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input Pelanggaran — SIGAP</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="../assets/images/logo-sekolah.png">
+
+  <style>
+    /* ── Two-column layout ──────────────────────────────── */
+    .input-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── Form card — dashboard style ────────────────────── */
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      animation: cardIn 0.35s ease both;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Header form card — mirip stat card dashboard */
+    .form-card-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top accent bar — ciri khas dashboard */
+    .form-card-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    }
+
+    .form-card-header-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--primary-xlight);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .form-card-header-text strong {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .form-card-header-text span {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-top: 1px;
+      display: block;
+    }
+
+    .form-card-body {
+      padding: 24px;
+    }
+
+    /* ── Searchable dropdown (siswa) ────────────────────── */
+    .searchable-dropdown {
+      position: relative;
+    }
+
+    .dropdown-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .dropdown-input-wrap .dd-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--gray-400);
+      font-size: 13px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .dropdown-input-wrap .dd-clear {
+      position: absolute;
+      right: 36px;
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      font-size: 12px;
+      padding: 4px;
+      cursor: pointer;
+      display: none;
+      transition: color var(--transition-fast);
+    }
+
+    .dropdown-input-wrap .dd-clear:hover {
+      color: var(--danger);
+    }
+
+    .dropdown-input-wrap .dd-clear.visible {
+      display: block;
+    }
+
+    .dropdown-input-wrap .dd-chevron {
+      position: absolute;
+      right: 12px;
+      color: var(--gray-400);
+      font-size: 11px;
+      pointer-events: none;
+      transition: transform var(--transition-fast);
+    }
+
+    .searchable-dropdown.open .dd-chevron {
+      transform: rotate(180deg);
+    }
+
+    .dd-input {
+      width: 100%;
+      padding: 10px 60px 10px 38px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      color: var(--gray-800);
+      background: var(--white);
+      outline: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: var(--font-body);
+    }
+
+    .dd-input:focus,
+    .searchable-dropdown.open .dd-input {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26, 79, 160, 0.1);
+    }
+
+    .dd-input.is-invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+
+    .dd-input::placeholder {
+      color: var(--gray-400);
+    }
+
+    .dd-list {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 200;
+      max-height: 240px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .searchable-dropdown.open .dd-list {
+      display: block;
+    }
+
+    .dd-search-wrap {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--gray-100);
+      position: sticky;
+      top: 0;
+      background: var(--white);
+    }
+
+    .dd-search {
+      width: 100%;
+      padding: 8px 10px 8px 32px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      outline: none;
+      background: var(--gray-50);
+      position: relative;
+      font-family: var(--font-body);
+      transition: all var(--transition-fast);
+    }
+
+    .dd-search:focus {
+      border-color: var(--primary);
+      background: var(--white);
+    }
+
+    .dd-search-icon {
+      position: absolute;
+      left: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-400);
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    .dd-option {
+      padding: 10px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background var(--transition-fast);
+      border-bottom: 1px solid var(--gray-50);
+    }
+
+    .dd-option:last-child {
+      border-bottom: none;
+    }
+
+    .dd-option:hover {
+      background: var(--primary-xlight);
+    }
+
+    .dd-option.selected {
+      background: var(--primary-xlight);
+    }
+
+    .dd-option-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .dd-option-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dd-option-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--gray-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dd-option-sub {
+      font-size: 11.5px;
+      color: var(--gray-400);
+      display: flex;
+      gap: 8px;
+    }
+
+    .dd-empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 13px;
+    }
+
+    .dd-empty i {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* Selected student strip */
+    .siswa-filter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+
+    .siswa-filter-grid .form-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .siswa-filter-hint {
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-bottom: 16px;
+    }
+
+    .siswa-filter-hint strong {
+      color: var(--primary);
+    }
+
+    html.dark .siswa-filter-hint {
+      color: #64748b !important;
+    }
+
+    html.dark .siswa-filter-hint strong {
+      color: #60a5fa !important;
+    }
+
+    @media (max-width: 575px) {
+      .siswa-filter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .selected-student-strip {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--primary-xlight);
+      border: 1.5px solid rgba(26, 79, 160, 0.25);
+      border-radius: var(--radius-md);
+      margin-top: 8px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .selected-student-strip.visible {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .selected-student-strip .ss-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .ss-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ss-info strong {
+      display: block;
+      font-size: 13.5px;
+      color: var(--primary-dark);
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ss-info span {
+      font-size: 12px;
+      color: var(--primary);
+    }
+
+    .ss-wa {
+      font-size: 12px;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── Tindak lanjut ──────────────────────────────────── */
+    .tindak-lanjut-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .tl-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .tl-option:hover {
+      border-color: var(--primary);
+      background: var(--primary-xlight);
+    }
+
+    .tl-option.active {
+      border-color: var(--primary);
+      background: var(--primary-xlight);
+      box-shadow: 0 0 0 3px rgba(26, 79, 160, 0.1);
+    }
+
+    .tl-option input[type="radio"] {
+      display: none;
+    }
+
+    .tl-option .tl-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      background: var(--gray-100);
+      color: var(--gray-500);
+      transition: all var(--transition-fast);
+    }
+
+    .tl-option.active .tl-icon {
+      background: var(--primary);
+      color: white;
+    }
+
+    .tl-option .tl-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    .tl-option .tl-text span {
+      font-size: 11.5px;
+      color: var(--gray-500);
+      line-height: 1.4;
+    }
+
+    /* ── Jenis indicator ────────────────────────────────── */
+    .jenis-option-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    /* ── WA Toggle ──────────────────────────────────────── */
+    .wa-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--gray-50);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .wa-toggle-wrap:hover {
+      border-color: var(--wa-green);
+      background: #f0fdf4;
+    }
+
+    .wa-toggle-wrap.active {
+      border-color: var(--wa-green);
+      background: #f0fdf4;
+      box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+    }
+
+    .wa-toggle-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: #dcfce7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--success);
+      flex-shrink: 0;
+      transition: all var(--transition-fast);
+    }
+
+    .wa-toggle-wrap.active .wa-toggle-icon {
+      background: var(--success);
+      color: white;
+    }
+
+    .wa-toggle-info {
+      flex: 1;
+    }
+
+    .wa-toggle-info strong {
+      display: block;
+      font-size: 13.5px;
+      color: var(--gray-800);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .wa-toggle-info span {
+      font-size: 12px;
+      color: var(--gray-500);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--gray-300);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch input:checked+.toggle-slider {
+      background: var(--wa-green);
+    }
+
+    .toggle-switch input:checked+.toggle-slider::before {
+      transform: translateX(20px);
+    }
+
+    /* ── Submit button — dashboard style ────────────────── */
+    .btn-submit-main {
+      flex: 1;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-blue);
+      transition: all var(--transition-base);
+      letter-spacing: 0.2px;
+    }
+
+    .btn-submit-main:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(26, 79, 160, 0.4);
+    }
+
+    .btn-submit-main:disabled {
+      opacity: 0.65;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    /* ── WA Preview panel ───────────────────────────────── */
+    .wa-preview-wrapper {
+      position: sticky;
+      top: calc(var(--topbar-height) + 20px);
+      animation: cardIn 0.35s 0.1s ease both;
+    }
+
+    .wa-preview-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Preview label header */
+    .preview-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-bottom: none;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      position: relative;
+    }
+
+    /* Accent bar pada preview label juga */
+    .preview-label::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--wa-dark), var(--wa-green));
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .preview-label-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preview-label-title i {
+      color: var(--wa-green);
+    }
+
+    .preview-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      color: var(--gray-400);
+    }
+
+    .preview-status .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .preview-status.inactive .dot {
+      background: var(--gray-300);
+      animation: none;
+    }
+
+    /* Phone frame */
+    .phone-frame {
+      background: #1a1a2e;
+      border-radius: 0 0 16px 16px;
+      padding: 10px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .phone-screen {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* WA header */
+    .wa-header {
+      background: var(--wa-dark);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wa-header-back {
+      color: white;
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    .wa-header-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--wa-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 15px;
+    }
+
+    .wa-header-info {
+      flex: 1;
+    }
+
+    .wa-header-info strong {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .wa-header-info span {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .wa-header-actions {
+      display: flex;
+      gap: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 15px;
+    }
+
+    /* WA body */
+    .wa-body {
+      background: var(--wa-bg);
+      background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23b2a99f' fill-opacity='0.12'%3E%3Ccircle cx='20' cy='20' r='1'/%3E%3C/g%3E%3C/svg%3E");
+      min-height: 200px;
+      padding: 14px 12px;
+    }
+
+    .wa-date-chip {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .wa-date-chip span {
+      background: rgba(255, 255, 255, 0.75);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      color: var(--gray-600);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .wa-bubble {
+      background: var(--wa-bubble);
+      border-radius: 0 12px 12px 12px;
+      padding: 10px 12px;
+      max-width: 92%;
+      display: inline-block;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .wa-bubble::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -8px;
+      border-top: 8px solid var(--wa-bubble);
+      border-left: 8px solid transparent;
+    }
+
+    .wa-bubble-school {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--wa-dark);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .wa-bubble-text {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #111;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .wa-placeholder {
+      color: #b0bec5;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .wa-value {
+      color: #111;
+      font-weight: 400;
+    }
+
+    .wa-b {
+      font-weight: 700;
+      color: #111;
+    }
+
+    .wa-i {
+      font-style: italic;
+    }
+
+    .wa-label {
+      font-weight: 600;
+      color: #111;
+    }
+
+    .wa-sep {
+      display: block;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.07);
+      margin: 8px 0;
+    }
+
+    .wa-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin: 3px 0;
+      line-height: 1.5;
+    }
+
+    .wa-row-emoji {
+      flex-shrink: 0;
+    }
+
+    .wa-row-content {
+      flex: 1;
+    }
+
+    .wa-tindak-block {
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 6px;
+      padding: 7px 10px;
+      margin: 8px 0 4px;
+      line-height: 1.55;
+    }
+
+    .wa-footer-block {
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .wa-bubble-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 5px;
+    }
+
+    .wa-bubble-time {
+      font-size: 10.5px;
+      color: var(--gray-500);
+    }
+
+    .wa-bubble-check {
+      color: #53bdeb;
+      font-size: 12px;
+    }
+
+    /* Char count */
+    .char-count {
+      font-size: 11.5px;
+      color: var(--gray-400);
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    .char-count.warn {
+      color: var(--warning);
+    }
+
+    /* Success overlay */
+    .success-overlay {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .success-overlay.visible {
+      display: flex;
+    }
+
+    .success-check {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--success-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: var(--success);
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Action buttons row (Reset / Simpan) */
+    .form-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .input-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .wa-preview-wrapper {
+        position: static;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-card-body {
+        padding: 16px;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .form-actions .btn,
+      .form-actions .btn-submit-main {
+        width: 100%;
+      }
+
+      .selected-student-strip {
+        flex-wrap: wrap;
+      }
+
+      .selected-student-strip .ss-wa {
+        margin-left: 48px;
+        /* sejajar dengan teks nama, di bawah avatar */
+      }
+
+    }
+
+    /* Sidebar user link */
+    .sidebar-user-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 10px;
+      transition: background 0.18s ease;
+      cursor: pointer;
+    }
+
+    .sidebar-user-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-user-arrow {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.35);
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: color 0.18s, transform 0.18s;
+    }
+
+    .sidebar-user-link:hover .sidebar-user-arrow {
+      color: rgba(255, 255, 255, 0.7);
+      transform: translateX(2px);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       DASHBOARD REDESIGN — Konsisten dengan Login/Register
+    ══════════════════════════════════════════════════════ */
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
+
+    /* ── Global body & font ─────────────────────────────── */
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f0f4ff;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 80% -10%, rgba(99, 130, 255, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 10% 100%, rgba(26, 79, 160, 0.05) 0%, transparent 60%);
+      background-attachment: fixed;
+    }
+
+    /* ── Sidebar — lebih gelap dan bersih ───────────────── */
+    .sidebar {
+      background: linear-gradient(180deg, #071a3e 0%, #0e2d6b 60%, #123780 100%);
+      border-right: none;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .sidebar-brand {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 0 18px;
+    }
+
+    .sidebar-brand-logo {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+
+    .sidebar-brand-text strong {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    .sidebar-brand-text small {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Nav links */
+    .sidebar-nav a {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.6);
+      border-radius: 8px;
+      margin: 1px 10px;
+      padding: 10px 12px;
+      transition: all 0.18s ease;
+    }
+
+    .sidebar-nav a:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .sidebar-nav a.active {
+      color: white;
+      background: rgba(255, 255, 255, 0.14);
+      font-weight: 600;
+    }
+
+    .sidebar-nav a.active::before {
+      background: #5de08a;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 55%;
+    }
+
+    .sidebar-nav a i {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    .sidebar-section-label {
+      font-size: 9.5px;
+      letter-spacing: 1.2px;
+      color: rgba(255, 255, 255, 0.28);
+      padding: 10px 22px 4px;
+    }
+
+    .sidebar-divider {
+      background: rgba(255, 255, 255, 0.07);
+      margin: 6px 10px;
+    }
+
+    /* Footer user card */
+    .sidebar-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 14px;
+    }
+
+    .sidebar-user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #2563c8, #5de08a);
+      font-size: 13px;
+      font-weight: 700;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .sidebar-user-info strong {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .sidebar-user-info span {
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .sidebar-user-link:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .sidebar-user-arrow {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ── Topbar ─────────────────────────────────────────── */
+    .topbar {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 1px 12px rgba(26, 79, 160, 0.06);
+    }
+
+    .topbar-page-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0d1f3c;
+      letter-spacing: -0.3px;
+    }
+
+    .topbar-breadcrumb {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* Topbar user pill */
+    .topbar-user {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 100px;
+      padding: 5px 14px 5px 6px;
+      gap: 9px;
+      transition: all 0.18s;
+      text-decoration: none;
+    }
+
+    .topbar-user:hover {
+      border-color: #1a4fa0;
+      background: #f0f4ff;
+      box-shadow: 0 2px 12px rgba(26, 79, 160, 0.12);
+    }
+
+    .topbar-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #1a4fa0, #5de08a);
+      font-size: 12px;
+      font-weight: 700;
+      border: 2px solid white;
+      box-shadow: 0 0 0 1.5px rgba(26, 79, 160, 0.2);
+    }
+
+    .topbar-user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    /* Logout button */
+    .btn-logout {
+      border-radius: 100px;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-width: 1.5px;
+      transition: all 0.18s;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.22);
+    }
+
+    /* Topbar date badge */
+    .topbar-date {
+      background: #f0f4ff;
+      border: 1px solid rgba(26, 79, 160, 0.12);
+      color: #475569;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .topbar-date i {
+      color: #1a4fa0;
+    }
+
+    /* ── Main content background ────────────────────────── */
+    .main-content {
+      padding: 24px 28px;
+    }
+
+    /* ── Page header ────────────────────────────────────── */
+    .page-header h2 {
+      font-size: 21px;
+      font-weight: 800;
+      color: #0d1f3c;
+      letter-spacing: -0.5px;
+    }
+
+    .page-header h2 i {
+      color: #1a4fa0;
+    }
+
+    /* ── Info panel (base, sama seperti dashboard) ───────── */
+    .info-panel {
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .info-panel i {
+      color: var(--primary);
+      font-size: 16px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .info-panel-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 2px;
+    }
+
+    .info-panel-text span {
+      font-size: 12.5px;
+      color: var(--gray-600);
+    }
+
+    .info-panel-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 2px 4px;
+      flex-shrink: 0;
+    }
+
+    .info-panel-close:hover {
+      color: var(--gray-700);
+    }
+
+    html.dark .info-panel {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(22, 163, 74, 0.08)) !important;
+      border-color: var(--dm-border) !important;
+      border-left-color: var(--dm-accent) !important;
+    }
+
+    html.dark .info-panel i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .info-panel-text strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .info-panel-text span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .info-panel-close {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .info-panel-close:hover {
+      color: var(--dm-text) !important;
+    }
+
+    @media (max-width: 768px) {
+      .info-panel {
+        padding: 12px;
+      }
+
+      .info-panel-text strong {
+        font-size: 12.5px;
+      }
+
+      .info-panel-text span {
+        font-size: 11.5px;
+      }
+    }
+
+    /* ── Info panel ─────────────────────────────────────── */
+    .info-panel {
+      background: linear-gradient(135deg, rgba(240, 244, 255, 0.9), rgba(240, 253, 244, 0.9));
+      border: 1px solid rgba(26, 79, 160, 0.12);
+      border-left: 4px solid #1a4fa0;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(26, 79, 160, 0.06);
+    }
+
+    /* ── Quick action buttons ───────────────────────────── */
+    .quick-action-btn {
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 9px 18px;
+      border-width: 1.5px;
+      transition: all 0.18s;
+    }
+
+    .quick-action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quick-action-btn.primary-qa {
+      background: linear-gradient(135deg, #1a4fa0, #2563c8);
+      border-color: transparent;
+      box-shadow: 0 4px 16px rgba(26, 79, 160, 0.30);
+    }
+
+    .quick-action-btn.primary-qa:hover {
+      box-shadow: 0 6px 20px rgba(26, 79, 160, 0.40);
+    }
+
+    /* ── Metric cards ───────────────────────────────────── */
+    .metric-card {
+      background: white;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.22s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(26, 79, 160, 0.12);
+      border-color: rgba(26, 79, 160, 0.15);
+    }
+
+    .metric-card::after {
+      height: 3.5px;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #64748b;
+      margin-top: 3px;
+    }
+
+    .metric-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      font-size: 20px;
+    }
+
+    /* ── Cards ──────────────────────────────────────────── */
+    .card {
+      background: white;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #fafbff;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0d1f3c;
+      letter-spacing: -0.2px;
+    }
+
+    .card-title i {
+      color: #1a4fa0;
+    }
+
+    .card-body {
+      padding: 18px 20px;
+    }
+
+    /* ── Status summary (WA) ────────────────────────────── */
+    .status-item {
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 12px 10px;
+    }
+
+    .status-item .status-num {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .status-item .status-lbl {
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+
+    /* ── Data table ─────────────────────────────────────── */
+    .data-table th {
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      padding: 11px 16px;
+      border-bottom: 1.5px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 12px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .student-cell .s-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0d1f3c;
+    }
+
+    .student-cell .s-nis {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* ── Section heading ────────────────────────────────── */
+    .section-heading {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
+      color: #94a3b8;
+    }
+
+    /* ── Badges ─────────────────────────────────────────── */
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    /* ── Chart legend ───────────────────────────────────── */
+    .chart-legend-item {
+      font-size: 12px;
+    }
+
+    .chart-legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+    }
+
+    .chart-legend-count {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0d1f3c;
+    }
+
+    /* ── See all link ───────────────────────────────────── */
+    .see-all-link {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #1a4fa0;
+    }
+
+    /* ── Animations ─────────────────────────────────────── */
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .metric-card {
+      animation: cardIn 0.45s ease both;
+    }
+
+    .metric-card:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+
+    .metric-card:nth-child(2) {
+      animation-delay: 0.10s;
+    }
+
+    .metric-card:nth-child(3) {
+      animation-delay: 0.15s;
+    }
+
+    .metric-card:nth-child(4) {
+      animation-delay: 0.20s;
+    }
+
+    .chart-card {
+      animation: cardIn 0.45s 0.22s ease both;
+    }
+
+    .recent-card {
+      animation: cardIn 0.45s 0.30s ease both;
+    }
+
+    .info-panel {
+      animation: cardIn 0.45s 0.00s ease both;
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════
+       DARK MODE — INPUT PELANGGARAN
+    ════════════════════════════════════════════════════════ */
+
+    :root {
+      --dm-bg: #0f172a;
+      --dm-surface: #1e293b;
+      --dm-surface-2: #253348;
+      --dm-surface-3: #2d3f55;
+      --dm-border: #2e3f55;
+      --dm-border-strong: #3d5068;
+      --dm-text: #e2e8f0;
+      --dm-text-2: #94a3b8;
+      --dm-text-3: #64748b;
+      --dm-accent: #3b82f6;
+      --dm-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+      --dm-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --dm-sidebar: #0d1829;
+      --dm-topbar: rgba(13, 24, 41, 0.95);
+    }
+
+    html.dark-transitioning *,
+    html.dark-transitioning *::before,
+    html.dark-transitioning *::after {
+      transition: background-color 0.22s ease, border-color 0.22s ease, color 0.18s ease, box-shadow 0.22s ease !important;
+    }
+
+    html.dark body {
+      background: var(--dm-bg) !important;
+      background-image: none !important;
+      color: var(--dm-text) !important;
+    }
+
+    /* Sidebar */
+    html.dark .sidebar {
+      background: var(--dm-sidebar) !important;
+      border-right: 1px solid var(--dm-border) !important;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    html.dark .sidebar-brand {
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-brand-logo {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    html.dark .sidebar-brand-text strong {
+      color: #fff !important;
+    }
+
+    html.dark .sidebar-brand-text small {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+
+    html.dark .sidebar-nav a {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .sidebar-nav a.active {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #60a5fa !important;
+    }
+
+    html.dark .sidebar-nav a.active::before {
+      background: #60a5fa !important;
+    }
+
+    html.dark .sidebar-section-label {
+      color: rgba(100, 116, 139, 0.7) !important;
+    }
+
+    html.dark .sidebar-divider {
+      background: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-footer {
+      border-top-color: var(--dm-border) !important;
+    }
+
+    html.dark .sidebar-user-info strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .sidebar-user-info span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .sidebar-user-arrow {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .sidebar-user-link:hover {
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* Topbar */
+    html.dark .topbar {
+      background: var(--dm-topbar) !important;
+      border-bottom-color: var(--dm-border) !important;
+      box-shadow: 0 1px 0 var(--dm-border), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+      backdrop-filter: blur(20px) !important;
+    }
+
+    html.dark .topbar-page-title {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .topbar-breadcrumb {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .topbar-hamburger {
+      color: var(--dm-text-2) !important;
+      background: transparent !important;
+    }
+
+    html.dark .topbar-hamburger:hover {
+      background: rgba(255, 255, 255, 0.06) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .topbar-date {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .topbar-date i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .topbar-user {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .topbar-user:hover {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-accent) !important;
+    }
+
+    html.dark .topbar-user-name {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .btn-logout {
+      background: rgba(220, 38, 38, 0.12) !important;
+      border-color: rgba(220, 38, 38, 0.3) !important;
+      color: #f87171 !important;
+    }
+
+    html.dark .btn-logout:hover {
+      background: rgba(220, 38, 38, 0.22) !important;
+      border-color: #f87171 !important;
+    }
+
+    /* Dark mode toggle button */
+    .btn-darkmode {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-darkmode:hover {
+      border-color: #1a4fa0;
+      color: #1a4fa0;
+      background: #eff6ff;
+    }
+
+    html.dark .btn-darkmode {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border-color: var(--dm-border) !important;
+      color: #fbbf24 !important;
+    }
+
+    html.dark .btn-darkmode:hover {
+      background: rgba(251, 191, 36, 0.12) !important;
+      border-color: #fbbf24 !important;
+      color: #fcd34d !important;
+    }
+
+    /* Page header */
+    html.dark .page-header h2 {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .page-header h2 i {
+      color: #60a5fa !important;
+    }
+
+    html.dark .page-subtitle {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .btn.btn-secondary {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .btn.btn-secondary:hover {
+      border-color: var(--dm-accent) !important;
+      color: var(--dm-text) !important;
+    }
+
+    /* Form card */
+    html.dark .form-card {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+      box-shadow: var(--dm-shadow-sm) !important;
+    }
+
+    html.dark .form-card-header {
+      background: var(--dm-surface-2) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .form-card-header-icon {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #60a5fa !important;
+    }
+
+    html.dark .form-card-header-text strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .form-card-header-text span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .form-card-body {
+      background: var(--dm-surface) !important;
+    }
+
+    /* Form elements */
+    html.dark .form-label {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .form-section-title {
+      color: var(--dm-text-3) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .form-error {
+      color: #f87171 !important;
+    }
+
+    html.dark .input-form,
+    html.dark .dd-input,
+    html.dark .dd-search {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .input-form::placeholder,
+    html.dark .dd-input::placeholder,
+    html.dark .dd-search::placeholder {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .input-form:focus,
+    html.dark .dd-input:focus,
+    html.dark .dd-search:focus {
+      border-color: var(--dm-accent) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }
+
+    html.dark select.input-form option {
+      background: var(--dm-surface-2);
+      color: var(--dm-text);
+    }
+
+    html.dark textarea.input-form {
+      background: var(--dm-surface-2) !important;
+      color: var(--dm-text) !important;
+    }
+
+    /* Searchable dropdown */
+    html.dark .dd-list {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    html.dark .dd-search-wrap {
+      background: var(--dm-surface) !important;
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .dd-search {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .dd-option {
+      border-bottom-color: var(--dm-border) !important;
+    }
+
+    html.dark .dd-option:hover {
+      background: rgba(59, 130, 246, 0.1) !important;
+    }
+
+    html.dark .dd-option.selected {
+      background: rgba(59, 130, 246, 0.12) !important;
+    }
+
+    html.dark .dd-option-name {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .dd-option-sub {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .dd-empty {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .dd-icon,
+    html.dark .dd-chevron,
+    html.dark .dd-clear {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .dd-clear:hover {
+      color: #f87171 !important;
+    }
+
+    html.dark .dd-search-icon {
+      color: var(--dm-text-3) !important;
+    }
+
+    /* Selected student strip */
+    html.dark .selected-student-strip {
+      background: rgba(59, 130, 246, 0.1) !important;
+      border-color: rgba(59, 130, 246, 0.3) !important;
+    }
+
+    html.dark .ss-info strong {
+      color: #93c5fd !important;
+    }
+
+    html.dark .ss-info span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .ss-wa {
+      color: #4ade80 !important;
+    }
+
+    /* Tindak lanjut */
+    html.dark .tl-option {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .tl-option:hover {
+      border-color: var(--dm-accent) !important;
+      background: rgba(59, 130, 246, 0.08) !important;
+    }
+
+    html.dark .tl-option.active {
+      border-color: var(--dm-accent) !important;
+      background: rgba(59, 130, 246, 0.12) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }
+
+    html.dark .tl-icon {
+      background: var(--dm-surface-3) !important;
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .tl-option.active .tl-icon {
+      background: var(--dm-accent) !important;
+      color: white !important;
+    }
+
+    html.dark .tl-text strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .tl-text span {
+      color: var(--dm-text-2) !important;
+    }
+
+    /* WA toggle */
+    html.dark .wa-toggle-wrap {
+      background: var(--dm-surface-2) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .wa-toggle-wrap:hover {
+      border-color: #22c55e !important;
+      background: rgba(34, 197, 94, 0.06) !important;
+    }
+
+    html.dark .wa-toggle-wrap.active {
+      border-color: #22c55e !important;
+      background: rgba(34, 197, 94, 0.08) !important;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12) !important;
+    }
+
+    html.dark .wa-toggle-icon {
+      background: rgba(34, 197, 94, 0.15) !important;
+      color: #4ade80 !important;
+    }
+
+    html.dark .wa-toggle-wrap.active .wa-toggle-icon {
+      background: #16a34a !important;
+      color: white !important;
+    }
+
+    html.dark .wa-toggle-info strong {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .wa-toggle-info span {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .toggle-slider {
+      background: var(--dm-border-strong) !important;
+    }
+
+    /* Char count */
+    html.dark .char-count {
+      color: var(--dm-text-3) !important;
+    }
+
+    /* WA Preview panel */
+    html.dark .preview-label {
+      background: var(--dm-surface) !important;
+      border-color: var(--dm-border) !important;
+    }
+
+    html.dark .preview-label-title {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark .preview-status {
+      color: var(--dm-text-3) !important;
+    }
+
+    html.dark .preview-status.inactive .dot {
+      background: var(--dm-border-strong) !important;
+    }
+
+    /* Success overlay */
+    html.dark .success-overlay {
+      background: var(--dm-surface) !important;
+    }
+
+    html.dark .success-check {
+      background: rgba(34, 197, 94, 0.15) !important;
+      color: #4ade80 !important;
+    }
+
+    html.dark .success-overlay h3 {
+      color: var(--dm-text) !important;
+    }
+
+    html.dark .success-overlay p {
+      color: var(--dm-text-2) !important;
+    }
+
+    /* Scrollbar */
+    html.dark ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    html.dark ::-webkit-scrollbar-track {
+      background: var(--dm-bg);
+    }
+
+    html.dark ::-webkit-scrollbar-thumb {
+      background: var(--dm-border-strong);
+      border-radius: 999px;
+    }
+
+    html.dark ::-webkit-scrollbar-thumb:hover {
+      background: #4a6080;
+    }
+
+    html.dark .text-muted {
+      color: var(--dm-text-2) !important;
+    }
+
+    html.dark small {
+      color: var(--dm-text-3) !important;
+    }
+
+    .tingkat-filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .tingkat-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--gray-200);
+      background: var(--white);
+      font-size: 12.5px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+    }
+
+    .tingkat-btn.active,
+    .tingkat-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-xlight);
+      color: var(--primary);
+    }
+
+    .tingkat-btn.tingkat-rendah.active {
+      border-color: #16a34a;
+      background: #f0fdf4;
+      color: #16a34a;
+    }
+
+    .tingkat-btn.tingkat-sedang.active {
+      border-color: #d97706;
+      background: #fffbeb;
+      color: #d97706;
+    }
+
+    .tingkat-btn.tingkat-berat.active {
+      border-color: #dc2626;
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .tingkat-badge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 99px;
+      background: currentColor;
+      color: white;
+      opacity: 0.85;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       TOPBAR RESPONSIF (disamakan dengan dashboard)
+       Diletakkan di paling akhir agar tidak tertimpa aturan
+       dasar .topbar-user / .btn-logout / .topbar-date di atas.
+    ════════════════════════════════════════════════════════ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    .main-content {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .topbar-date {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .topbar-date i {
+      font-size: 11px;
+    }
+
+    .topbar-user-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 0 14px;
+        gap: 10px;
+      }
+
+      .topbar-left {
+        gap: 10px;
+      }
+
+      .topbar-page-title {
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+      }
+
+      .topbar-right {
+        gap: 8px;
+      }
+
+      .topbar-date {
+        padding: 5px 10px;
+        font-size: 11.5px;
+      }
+
+      .topbar-user {
+        padding: 5px 8px;
+      }
+
+      .btn-logout {
+        padding: 7px 10px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar-user-name {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .topbar {
+        padding: 0 10px;
+      }
+
+      .topbar-breadcrumb {
+        display: none;
+      }
+
+      .topbar-date {
+        display: none;
+      }
+
+      .btn-logout-text {
+        display: none;
+      }
+
+      .btn-logout {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+      }
+
+      .topbar-user {
+        padding: 0;
+        border: none;
+        background: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-wrapper">
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo">
+          <img src="../assets/images/logo-sekolah.png" alt="Logo SMK Negeri 1 Masbagik"
+            style="width:30px; height:30px; object-fit:contain;">
+        </div>
+        <div class="sidebar-brand-text">
+          <strong>SIGAP</strong>
+          <small id="sb-school">SMKN 1 Masbagik</small>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Menu Utama</div>
+        <a href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+        <a href="data-siswa.html"><i class="fa-solid fa-users"></i><span>Data Siswa</span></a>
+        <a href="input-pelanggaran.html"><i class="fa-solid fa-circle-plus"></i><span>Input Pelanggaran</span></a>
+        <a href="riwayat.html"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></a>
+        <a href="laporan.html"><i class="fa-solid fa-chart-pie"></i><span>Laporan</span></a>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-label">Akun</div>
+        <a href="profile.html"><i class="fa-solid fa-user-circle"></i><span>Profil Saya</span></a>
+        <a href="#" data-logout><i class="fa-solid fa-right-from-bracket"></i><span>Keluar</span></a>
+      </nav>
+      <!-- Sidebar footer -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-user-avatar" id="sb-avatar">SW</div>
+          <div class="sidebar-user-info">
+            <strong id="sb-username">Sri Wahyuni</strong>
+            <span id="sb-role">Guru BK</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-hamburger" id="hamburger-btn">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+          <div class="topbar-page-title">Input Pelanggaran</div>
+          <div class="topbar-breadcrumb">
+            <i class="fa-solid fa-house" style="font-size:9px"></i>
+            <i class="fa-solid fa-chevron-right" style="font-size:8px"></i>
+            <span>Input Pelanggaran</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="topbar-date-text">—</span>
+        </div>
+        <!-- Dark Mode Toggle -->
+        <button class="btn-darkmode" id="btn-darkmode" title="Ganti tema gelap/terang" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon" id="dm-icon"></i>
+        </button>
+        <a href="profile.html" class="topbar-user" title="Lihat Profil Saya">
+          <div class="topbar-avatar" id="topbar-avatar">—</div>
+          <span class="topbar-user-name" id="topbar-username">—</span>
+        </a>
+        <button class="btn-logout" data-logout>
+          <i class="fa-solid fa-right-from-bracket"></i> <span class="btn-logout-text">Keluar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- Info panel -->
+      <div class="info-panel" id="info-panel">
+        <i class="fa-solid fa-circle-info"></i>
+        <div class="info-panel-text">
+          <strong>Cara Hitung Poin Pelanggaran</strong>
+          <span>Poin pelanggaran dijumlahkan (Ringan = 1, Sedang = 2, Berat = 3), lalu dibagi (jumlah pelanggaran × 3)
+            dan dikali 100%. Contoh: 4 pelanggaran dengan total 8 poin → 8 ÷ 12 × 100% = 67%.</span>
+        </div>
+        <button class="info-panel-close" id="close-info" title="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Page Header — dashboard style -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h2><i class="fa-solid fa-circle-plus"></i> Input Pelanggaran</h2>
+          <p class="page-subtitle">Catat pelanggaran siswa dan kirim notifikasi ke orang tua via WhatsApp</p>
+        </div>
+        <a href="riwayat.html" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-clock-rotate-left"></i> Lihat Riwayat
+        </a>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="input-layout">
+
+        <!-- ═══ LEFT: FORM ═══════════════════════════════════ -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="form-card-header-icon">
+              <i class="fa-solid fa-file-pen"></i>
+            </div>
+            <div class="form-card-header-text">
+              <strong>Form Pencatatan Pelanggaran</strong>
+              <span>Isi semua field yang diperlukan sebelum menyimpan</span>
+            </div>
+          </div>
+
+          <div class="form-card-body" id="form-body">
+
+            <!-- Section: Identitas Siswa -->
+            <div class="form-section-title">Identitas Siswa</div>
+
+            <!-- Searchable dropdown siswa -->
+            <div style="margin-bottom: 16px;">
+              <label class="form-label">
+                Nama Siswa <span style="color:var(--danger)">*</span>
+              </label>
+              <div class="searchable-dropdown" id="siswa-dropdown">
+                <div class="dropdown-input-wrap">
+                  <i class="fa-solid fa-user dd-icon"></i>
+                  <input type="text" class="dd-input" id="dd-trigger" placeholder="Ketik atau pilih nama siswa..."
+                    readonly />
+                  <button class="dd-clear" id="dd-clear" title="Hapus pilihan">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                  <i class="fa-solid fa-chevron-down dd-chevron"></i>
+                </div>
+
+
+                <!-- Dropdown list -->
+                <div class="dd-list" id="dd-list">
+                  <div class="dd-search-wrap" style="position:relative;">
+                    <i class="fa-solid fa-magnifying-glass dd-search-icon"></i>
+                    <input type="text" class="dd-search" id="dd-search" placeholder="Cari nama atau NIS..."
+                      autocomplete="off" />
+                  </div>
+                  <div id="dd-options"><!-- filled by JS --></div>
+                </div>
+              </div>
+              <div class="form-error" id="err-siswa" style="display:none;">
+                <i class="fa-solid fa-circle-exclamation"></i> Siswa wajib dipilih.
+              </div>
+
+              <!-- Selected student strip -->
+              <div class="selected-student-strip" id="selected-strip">
+                <div class="ss-avatar av-0" id="strip-avatar">—</div>
+                <div class="ss-info">
+                  <strong id="strip-nama">—</strong>
+                  <span id="strip-detail">—</span>
+                </div>
+                <div class="ss-wa" id="strip-wa">
+                  <i class="fa-brands fa-whatsapp"></i>
+                  <span id="strip-wa-num">—</span>
+                </div>
+              </div>
+
+
+              <!-- Pilih Kelas / Jurusan / Jenis Kelamin (mempersempit daftar siswa) -->
+              <div class="siswa-filter-grid">
+                <div>
+                  <label class="form-label"><i class="fa-solid fa-chalkboard"></i> Kelas</label>
+                  <select class="input-form" id="f-filter-kelas">
+                    <option value="">Semua Kelas</option>
+                    <option value="X">X</option>
+                    <option value="XI">XI</option>
+                    <option value="XII">XII</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label"><i class="fa-solid fa-graduation-cap"></i> Jurusan</label>
+                  <select class="input-form" id="f-filter-jurusan">
+                    <option value="">Semua Jurusan</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label"><i class="fa-solid fa-venus-mars"></i> Jenis Kelamin</label>
+                  <select class="input-form" id="f-filter-gender">
+                    <option value="">Semua</option>
+                    <option value="L">Laki-laki</option>
+                    <option value="P">Perempuan</option>
+                  </select>
+                </div>
+              </div>
+              <div class="siswa-filter-hint">
+                Terisi otomatis saat siswa dipilih, atau pilih untuk mempersempit daftar nama siswa.
+                Tersedia <strong id="filter-count">0</strong> siswa.
+              </div>
+            </div>
+
+            <!-- Section: Detail Pelanggaran -->
+            <div class="form-section-title">Detail Pelanggaran</div>
+
+            <div class="form-row cols-2">
+              <!-- Jenis Pelanggaran -->
+              <div>
+                <label class="form-label">
+                  Jenis Pelanggaran <span style="color:var(--danger)">*</span>
+                </label>
+                <select class="input-form" id="f-jenis">
+                  <option value="">-- Pilih Jenis --</option>
+                </select>
+                <div class="form-error" id="err-jenis" style="display:none;">
+                  <i class="fa-solid fa-circle-exclamation"></i> Jenis pelanggaran wajib dipilih.
+                </div>
+
+                <!-- Preview Poin — muncul saat jenis dipilih -->
+                <div id="poin-preview" style="display:none; margin-top:10px;">
+                  <div id="poin-preview-inner" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 14px;
+                    border-radius: 100px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    border: 1.5px solid transparent;
+                    transition: all 0.2s ease;
+                  ">
+                    <i id="poin-icon" class="fa-solid fa-circle-exclamation"></i>
+                    <span id="poin-label">—</span>
+                    <span id="poin-angka" style="opacity:0.75; font-size:11.5px; font-weight:700;"></span>
+                  </div>
+                  <!-- kontribusi ke persentase -->
+                  <div id="poin-kontribusi" style="
+                    margin-top:5px; font-size:11.5px; color:var(--gray-400);
+                    display:flex; align-items:center; gap:5px;">
+                    <i class="fa-solid fa-chart-pie" style="font-size:10px;"></i>
+                    <span id="poin-kontribusi-text"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tanggal -->
+              <div>
+                <label class="form-label">
+                  Tanggal <span style="color:var(--danger)">*</span>
+                </label>
+                <input type="date" class="input-form" id="f-tanggal" />
+                <div class="form-error" id="err-tanggal" style="display:none;">
+                  <i class="fa-solid fa-circle-exclamation"></i> Tanggal wajib diisi.
+                </div>
+              </div>
+            </div>
+
+            <!-- Tindak Lanjut -->
+            <div style="margin-bottom: 16px;">
+              <label class="form-label">
+                Tindak Lanjut
+                <span style="font-size:11px; color:var(--gray-400); font-weight:400; margin-left:4px;">(informasi untuk
+                  orang tua)</span>
+              </label>
+              <div class="tindak-lanjut-group">
+                <label class="tl-option active" id="tl-sekolah">
+                  <input type="radio" name="tindak_lanjut" value="sekolah" checked />
+                  <div class="tl-icon"><i class="fa-solid fa-school"></i></div>
+                  <div class="tl-text">
+                    <strong>Diselesaikan di Sekolah</strong>
+                    <span>Masalah telah ditangani oleh Guru BK di sekolah, orang tua tidak perlu hadir.</span>
+                  </div>
+                </label>
+                <label class="tl-option" id="tl-hadir">
+                  <input type="radio" name="tindak_lanjut" value="hadir" />
+                  <div class="tl-icon"><i class="fa-solid fa-person-walking-arrow-right"></i></div>
+                  <div class="tl-text">
+                    <strong>Orang Tua Dimohon Hadir ke Sekolah</strong>
+                    <span>Diperlukan pertemuan antara orang tua dan Guru BK untuk tindak lanjut lebih lanjut.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Keterangan -->
+            <div style="margin-bottom: 16px;">
+              <label class="form-label">Keterangan / Catatan</label>
+              <textarea class="input-form" id="f-keterangan"
+                placeholder="Tulis keterangan tambahan tentang pelanggaran ini..." rows="3"></textarea>
+              <div class="char-count">
+                <span id="char-count-val">0</span>/300 karakter
+              </div>
+            </div>
+
+            <!-- WA Toggle -->
+            <div style="margin-bottom: 20px;">
+              <label class="form-label">Notifikasi WhatsApp</label>
+              <div class="wa-toggle-wrap active" id="wa-toggle-wrap">
+                <div class="wa-toggle-icon">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <div class="wa-toggle-info">
+                  <strong>Kirim notifikasi ke orang tua</strong>
+                  <span>Pesan akan dikirim otomatis ke nomor WA yang terdaftar</span>
+                </div>
+                <label class="toggle-switch" onclick="event.stopPropagation()">
+                  <input type="checkbox" id="f-send-wa" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="btn-reset" style="min-width:120px;">
+                <i class="fa-solid fa-rotate-left"></i> Reset Form
+              </button>
+              <button type="button" class="btn-submit-main" id="btn-submit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span id="submit-text">Simpan &amp; Kirim WA</span>
+                <span class="btn-spinner" id="submit-spinner" style="display:none;"></span>
+              </button>
+            </div>
+
+          </div><!-- /form-card-body -->
+
+          <!-- Success overlay (shown after submit) -->
+          <div class="success-overlay" id="success-overlay">
+            <div class="success-check">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 style="font-size:18px; font-weight:700; color:var(--gray-900);">Pelanggaran Berhasil Disimpan!</h3>
+            <p style="font-size:13.5px; color:var(--gray-500); max-width:280px; line-height:1.6;" id="success-desc">
+              Data pelanggaran telah dicatat dan notifikasi WA telah dikirim ke orang tua.
+            </p>
+            <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; justify-content:center;">
+              <button class="btn btn-secondary" id="btn-input-lagi">
+                <i class="fa-solid fa-plus"></i> Input Lagi
+              </button>
+              <a href="riwayat.html" class="btn btn-primary">
+                <i class="fa-solid fa-list"></i> Lihat Riwayat
+              </a>
+            </div>
+          </div>
+
+        </div><!-- /form-card -->
+
+        <!-- ═══ RIGHT: WA PREVIEW ═════════════════════════════ -->
+        <div class="wa-preview-wrapper">
+
+          <!-- Preview label -->
+          <div class="preview-label">
+            <div class="preview-label-title">
+              <i class="fa-brands fa-whatsapp"></i>
+              Preview Pesan WhatsApp
+            </div>
+            <div class="preview-status" id="preview-status">
+              <span class="dot"></span>
+              <span>Live preview</span>
+            </div>
+          </div>
+
+          <!-- Phone frame -->
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <!-- WA App Header -->
+              <div class="wa-header">
+                <i class="fa-solid fa-arrow-left wa-header-back"></i>
+                <div class="wa-header-avatar">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="wa-header-info">
+                  <strong id="wa-contact-name">Orang Tua Siswa</strong>
+                  <span id="wa-contact-num">+62 —</span>
+                </div>
+                <div class="wa-header-actions">
+                  <i class="fa-solid fa-video"></i>
+                  <i class="fa-solid fa-phone"></i>
+                </div>
+              </div>
+
+              <!-- WA Chat Body -->
+              <div class="wa-body">
+                <div class="wa-date-chip">
+                  <span id="wa-date-chip">Hari ini</span>
+                </div>
+
+                <div class="wa-bubble">
+                  <div class="wa-bubble-school">
+                    <i class="fa-solid fa-school" style="font-size:10px;"></i>
+                    SIGAP — <span id="wa-school-name">SMK Negeri 1 Masbagik</span>
+                  </div>
+                  <div class="wa-bubble-text" id="wa-preview-text">
+                    <!-- Filled by JS -->
+                  </div>
+                  <div class="wa-bubble-footer">
+                    <span class="wa-bubble-time" id="wa-time-display">—</span>
+                    <i class="fa-solid fa-check-double wa-bubble-check" id="wa-check-icon"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- WA Input bar (decorative) -->
+              <div style="background:#f0f2f5; padding:8px 10px; display:flex; align-items:center; gap:10px;">
+                <div
+                  style="flex:1; background:white; border-radius:100px; padding:8px 14px; font-size:12px; color:var(--gray-400);">
+                  Ketik pesan...
+                </div>
+                <div
+                  style="width:34px; height:34px; border-radius:50%; background:var(--wa-green); display:flex; align-items:center; justify-content:center; color:white; font-size:13px;">
+                  <i class="fa-solid fa-microphone"></i>
+                </div>
+              </div>
+            </div><!-- /phone-screen -->
+          </div><!-- /phone-frame -->
+
+          <!-- WA toggle disabled notice -->
+          <div id="wa-disabled-notice" style="display:none; margin-top:10px; padding:10px 14px; background:var(--gray-100);
+                 border-radius:var(--radius-md); font-size:12.5px; color:var(--gray-500);
+                 display:none; align-items:center; gap:8px; border:1px solid var(--gray-200);">
+            <i class="fa-solid fa-bell-slash"></i>
+            Notifikasi WA dinonaktifkan. Pelanggaran akan disimpan tanpa mengirim pesan.
+          </div>
+
+        </div><!-- /wa-preview-wrapper -->
+
+      </div><!-- /input-layout -->
+
+    </main>
+  </div><!-- /app-wrapper -->
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ═══ MODAL KONFIRMASI KELUAR ════════════════════════════════ -->
+  <div id="modalKeluarOverlay" style="
+    position:fixed; inset:0;
+    background:rgba(15,23,42,0.65);
+    z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+    backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none;
+    transition:opacity 250ms cubic-bezier(0.4,0,0.2,1);">
+
+    <div id="modal-keluar-content" style="
+      background:#ffffff;
+      border-radius:24px;
+      width:100%; max-width:360px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25), 0 8px 16px rgba(0,0,0,0.1);
+      text-align:center;
+      transform:scale(0.95) translateY(16px);
+      transition:transform 250ms cubic-bezier(0.4,0,0.2,1);
+      overflow:hidden;">
+
+      <div style="padding:36px 28px 24px;">
+        <div style="
+          width:80px; height:80px; border-radius:50%;
+          background:#dc2626;
+          display:flex; align-items:center; justify-content:center;
+          margin:0 auto 20px;
+          box-shadow:0 8px 24px rgba(220,38,38,0.35);">
+          <i class="fa-solid fa-right-from-bracket" style="color:#fff;font-size:28px;"></i>
+        </div>
+        <h5 id="modal-keluar-title" style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">
+          Konfirmasi Keluar
+        </h5>
+        <p id="modal-keluar-desc" style="font-size:14px;color:#64748b;margin:0;line-height:1.6;">
+          Apakah Anda yakin ingin keluar dari aplikasi SIGAP?
+        </p>
+      </div>
+
+      <div id="modal-keluar-footer" style="
+        display:flex; gap:10px;
+        padding:16px 24px;
+        border-top:1px solid #f1f5f9;
+        background:#f8fafc;">
+        <button type="button" id="btn-batal-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:1.5px solid #e2e8f0; background:#ffffff; color:#475569;
+          transition:background 150ms ease;">
+          Batal
+        </button>
+        <button type="button" id="btn-konfirmasi-keluar" style="
+          flex:1; height:42px; font-size:14px; font-weight:600;
+          font-family:inherit; border-radius:10px; cursor:pointer;
+          border:none; background:#dc2626; color:#ffffff;
+          transition:background 150ms ease;">
+          Ya, Keluar
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- ════════════════════════════════════════════════════════════ -->
+
+  <style>
+    #modalKeluarOverlay.active {
+      opacity: 1 !important;
+      pointer-events: all !important;
+    }
+
+    #modalKeluarOverlay.active #modal-keluar-content {
+      transform: scale(1) translateY(0) !important;
+    }
+
+    #btn-batal-keluar:hover {
+      background: #f1f5f9 !important;
+    }
+
+    #btn-konfirmasi-keluar:hover {
+      background: #b91c1c !important;
+    }
+
+    html.dark #modal-keluar-content {
+      background: #1e293b !important;
+    }
+
+    html.dark #modal-keluar-title {
+      color: #f1f5f9 !important;
+    }
+
+    html.dark #modal-keluar-desc {
+      color: #94a3b8 !important;
+    }
+
+    html.dark #modal-keluar-footer {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+    }
+
+    html.dark #btn-batal-keluar {
+      background: #334155 !important;
+      border-color: #475569 !important;
+      color: #94a3b8 !important;
+    }
+
+    html.dark #btn-batal-keluar:hover {
+      background: #3f546e !important;
+      color: #e2e8f0 !important;
+    }
+  </style>
+
+  <script src="../assets/js/api.js"></script>
+  <script>
+    /* ============================================================
+       INPUT-PELANGGARAN.JS (API VERSION)
+       ============================================================ */
+
+    // ── Auth & layout ─────────────────────────────────────────
+    const currentUser = requireAuth();
+    initLayout('Input Pelanggaran');
+
+    // Topbar date — sama seperti dashboard
+    (function () {
+      const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const d = new Date();
+      const teks = `${HARI[d.getDay()]}, ${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`;
+      const el = document.getElementById('topbar-date-text');
+      if (el) el.textContent = teks;
+    })();
+
+    (function () {
+      const u = currentUser;
+      if (!u) return;
+
+      // ── Sidebar footer: nama, inisial, dan role ──────────
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+
+      const roleLabelMap = { admin: 'Administrator', guru_bk: 'Guru BK', wali_kelas: 'Wali Kelas' };
+      setEl('sb-username', u.nama || '—');
+      setEl('sb-role', roleLabelMap[u.role] || u.role || '—');
+      setEl('sb-avatar', u.avatar || (u.nama ? u.nama.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?'));
+
+      // ── Topbar ───────────────────────────────────────────
+      setEl('topbar-avatar', u.avatar || (u.nama ? u.nama.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : '?'));
+      setEl('topbar-username', u.nama || '—');
+
+      // ── Nama sekolah ─────────────────────────────────────
+      // Nama sekolah di sidebar statis (sama seperti data-siswa.html)
+      const waSchool = document.getElementById('wa-school-name');
+      if (waSchool) waSchool.textContent = (typeof SIGAP_CONFIG !== 'undefined' && SIGAP_CONFIG.namaSekolah)
+        ? SIGAP_CONFIG.namaSekolah
+        : 'SMK Negeri 1 Masbagik';
+    })();
+
+    // ── State ─────────────────────────────────────────────────
+    let SISWA = [];
+    let JENIS_PELANGGARAN = [];
+    let selectedSiswa = null;
+    let ddOpen = false;
+    const MAX_KETERANGAN = 300;
+
+    // ── Set default date = today ───────────────────────────────
+    const today = new Date();
+    const todayISO = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    document.getElementById('f-tanggal').value = todayISO;
+
+    // ── Fetch Initial Data ────────────────────────────────────
+    async function loadData() {
+      // Tampilkan loading di dropdown sementara data dimuat
+      document.getElementById('dd-trigger').placeholder = "Memuat data siswa...";
+
+      const [resSiswa, resJenis] = await Promise.all([
+        apiRequest('api/siswa.php?per_page=1000'),
+        apiRequest('api/pelanggaran.php?action=jenis')
+      ]);
+
+      if (resSiswa && resSiswa.success) {
+        SISWA = resSiswa.data.data || resSiswa.data;
+        document.getElementById('dd-trigger').placeholder = "Ketik atau pilih nama siswa...";
+        updateFilterCount();
+      }
+
+      if (resJenis && resJenis.success) {
+        JENIS_PELANGGARAN = Array.isArray(resJenis.data) ? resJenis.data : (resJenis.data?.data || []);
+        populateJenis();
+      } else {
+        document.getElementById('f-jenis').innerHTML = '<option value="">Gagal memuat jenis pelanggaran</option>';
+      }
+    }
+
+    // ── Populate jenis pelanggaran ────────────────────────────
+    // Nilai tingkat di DB (enum): 'rendah' | 'sedang' | 'berat'
+    function normTingkat(t) {
+      t = String(t || '').toLowerCase().trim();
+      return t === 'ringan' ? 'rendah' : t;
+    }
+
+    function populateJenis() {
+      const sel = document.getElementById('f-jenis');
+      sel.innerHTML = '<option value="">-- Pilih Pelanggaran --</option>';
+
+      const groups = { rendah: [], sedang: [], berat: [] };
+      JENIS_PELANGGARAN.forEach(j => {
+        if (j.is_active !== undefined && String(j.is_active) === '0') return;
+        const t = normTingkat(j.tingkat);
+        if (groups[t]) groups[t].push(j);
+      });
+
+      const labelMap = {
+        rendah: '🟡 RINGAN — 1 Poin',
+        sedang: '🟠 SEDANG — 2 Poin',
+        berat: '🔴 BERAT — 3 Poin',
+      };
+
+      for (const tingkat of ['rendah', 'sedang', 'berat']) {
+        if (groups[tingkat].length === 0) continue;
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = labelMap[tingkat];
+        groups[tingkat].forEach(j => {
+          const opt = document.createElement('option');
+          opt.value = j.id;
+          opt.textContent = j.nama;
+          opt.dataset.poin = j.poin;
+          opt.dataset.tingkat = tingkat;
+          opt.dataset.nama = j.nama;   // dibaca oleh preview WA
+          optgroup.appendChild(opt);
+        });
+        sel.appendChild(optgroup);
+      }
+
+      if (sel.options.length === 1) {
+        sel.innerHTML = '<option value="">Data jenis pelanggaran kosong</option>';
+      }
+    }
+
+    // Start loading data
+    loadData();
+
+    // ── Avatar helper ─────────────────────────────────────────
+    const AV_COLORS = ['#1a4fa0', '#16a34a', '#d97706', '#dc2626', '#7c3aed', '#0891b2', '#db2777', '#059669', '#ea580c', '#4f46e5', '#0d9488', '#65a30d'];
+
+    function getInitials(nama) {
+      const p = nama.trim().split(' ').filter(Boolean);
+      if (p.length === 0) return '?';
+      return p.length === 1 ? p[0].substring(0, 2).toUpperCase() : (p[0][0] + p[p.length - 1][0]).toUpperCase();
+    }
+
+    function getSiswaAvColor(idx) {
+      return AV_COLORS[idx % AV_COLORS.length];
+    }
+
+    // ── Helper identitas siswa (kelas, jurusan, gender) ────────
+    function genderLabel(s) {
+      const g = String(s?.gender ?? s?.jenis_kelamin ?? '').toUpperCase();
+      if (g === 'L' || g.startsWith('LAKI')) return 'Laki-laki';
+      if (g === 'P' || g.startsWith('PEREMPUAN')) return 'Perempuan';
+      return '';
+    }
+    function jurusanLabel(s) {
+      if (!s) return '';
+      if (s.jurusan_nama) return s.jurusan_kode ? `${s.jurusan_nama} (${s.jurusan_kode})` : s.jurusan_nama;
+      return s.jurusan_kode || '';
+    }
+    // ── Filter siswa: kelas / jurusan / gender ────────────────
+    function tingkatOf(kelas) {
+      return String(kelas || '').trim().split(/\s+/)[0].toUpperCase(); // "XII TKJ 1" → "XII"
+    }
+
+    function getFilteredSiswa() {
+      const fk = document.getElementById('f-filter-kelas').value;
+      const fj = document.getElementById('f-filter-jurusan').value;
+      const fg = document.getElementById('f-filter-gender').value;
+      return SISWA.filter(s =>
+        (!fk || tingkatOf(s.kelas) === fk) &&
+        (!fj || s.jurusan_kode === fj) &&
+        (!fg || String(s.gender || '').toUpperCase() === fg)
+      );
+    }
+
+    function updateFilterCount() {
+      document.getElementById('filter-count').textContent = getFilteredSiswa().length;
+    }
+
+    function onFilterChange() {
+      // Jika siswa terpilih tidak cocok lagi dengan filter → batalkan pilihan
+      if (selectedSiswa && !getFilteredSiswa().some(s => s.id === selectedSiswa.id)) {
+        clearSiswaSelection();
+      }
+      updateFilterCount();
+      if (ddOpen) renderDropdownOptions(document.getElementById('dd-search').value);
+    }
+
+    // Saat siswa dipilih → isi otomatis kelas/jurusan/gender sesuai datanya
+    function syncFilterToSiswa(s) {
+      const setIfExists = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && [...el.options].some(o => o.value === val)) el.value = val;
+      };
+      setIfExists('f-filter-kelas', tingkatOf(s.kelas));
+      setIfExists('f-filter-jurusan', s.jurusan_kode || '');
+      setIfExists('f-filter-gender', String(s.gender || '').toUpperCase());
+      updateFilterCount();
+    }
+
+    async function loadJurusanFilter() {
+      const sel = document.getElementById('f-filter-jurusan');
+      const res = await apiRequest('api/siswa.php?action=jurusan');
+      const list = (res && res.success && Array.isArray(res.data)) ? res.data : [];
+      list.forEach(j => sel.add(new Option(`${j.kode} — ${j.nama}`, j.kode)));
+    }
+
+    ['f-filter-kelas', 'f-filter-jurusan', 'f-filter-gender'].forEach(id =>
+      document.getElementById(id).addEventListener('change', onFilterChange));
+    loadJurusanFilter();
+
+    // ── Searchable dropdown ───────────────────────────────────
+    function renderDropdownOptions(query = '') {
+      const container = document.getElementById('dd-options');
+      const q = query.toLowerCase().trim();
+
+      const filtered = getFilteredSiswa().filter(s =>
+        !q ||
+        s.nama.toLowerCase().includes(q) ||
+        s.nis.includes(q) ||
+        String(s.kelas || '').toLowerCase().includes(q) ||
+        String(s.jurusan_kode || '').toLowerCase().includes(q)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+      <div class="dd-empty">
+        <i class="fa-solid fa-user-slash"></i>
+        Tidak ada siswa ditemukan
+      </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map((s, i) => {
+        const initials = getInitials(s.nama);
+        const avColor = getSiswaAvColor(SISWA.indexOf(s));
+        const isSelected = selectedSiswa && selectedSiswa.id === s.id;
+
+        const hl = (text) => {
+          if (!q) return text;
+          return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+            '<mark style="background:#fef08a;border-radius:2px;padding:0 1px;">$1</mark>');
+        };
+
+        return `
+      <div class="dd-option${isSelected ? ' selected' : ''}" onclick="selectSiswa(${s.id})">
+        <div class="dd-option-avatar" style="background:${avColor};">${initials}</div>
+        <div class="dd-option-info">
+          <div class="dd-option-name">${hl(s.nama)}</div>
+          <div class="dd-option-sub">
+            <span style="font-family:var(--font-mono);">${hl(s.nis)}</span>
+            <span>•</span>
+            <span>${hl(String(s.kelas || ''))}${s.jurusan_kode ? ' ' + hl(String(s.jurusan_kode)) : ''}</span>
+          </div>
+        </div>
+        ${isSelected ? '<i class="fa-solid fa-check" style="color:var(--primary);font-size:12px;"></i>' : ''}
+      </div>`;
+      }).join('');
+    }
+
+    function openDropdown() {
+      ddOpen = true;
+      document.getElementById('siswa-dropdown').classList.add('open');
+      setTimeout(() => {
+        const searchEl = document.getElementById('dd-search');
+        if (searchEl) { searchEl.value = ''; searchEl.focus(); }
+      }, 50);
+      renderDropdownOptions('');
+    }
+
+    function closeDropdown() {
+      ddOpen = false;
+      document.getElementById('siswa-dropdown').classList.remove('open');
+    }
+
+    document.getElementById('dd-trigger').addEventListener('click', () => {
+      ddOpen ? closeDropdown() : openDropdown();
+    });
+
+    document.getElementById('dd-search').addEventListener('input', function () {
+      renderDropdownOptions(this.value);
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function (e) {
+      const dropdown = document.getElementById('siswa-dropdown');
+      if (ddOpen && !dropdown.contains(e.target)) closeDropdown();
+    });
+
+    // Clear button
+    document.getElementById('dd-clear').addEventListener('click', function (e) {
+      e.stopPropagation();
+      clearSiswaSelection();
+    });
+
+    function selectSiswa(id) {
+      selectedSiswa = SISWA.find(s => s.id === id);
+      if (!selectedSiswa) return;
+
+      // Update trigger input
+      const trigger = document.getElementById('dd-trigger');
+      trigger.value = selectedSiswa.nama;
+
+      // Show clear button
+      document.getElementById('dd-clear').classList.add('visible');
+
+      // Show selected strip
+      const strip = document.getElementById('selected-strip');
+      strip.classList.add('visible');
+
+      const idx = SISWA.indexOf(selectedSiswa);
+      const stripAv = document.getElementById('strip-avatar');
+      stripAv.textContent = getInitials(selectedSiswa.nama);
+      stripAv.style.background = getSiswaAvColor(idx);
+
+      document.getElementById('strip-nama').textContent = selectedSiswa.nama;
+      document.getElementById('strip-detail').textContent = `NIS: ${selectedSiswa.nis}`;
+      syncFilterToSiswa(selectedSiswa);
+      document.getElementById('strip-wa-num').textContent = selectedSiswa.wa_ortu || '—';
+
+      // Clear error
+      document.getElementById('err-siswa').style.display = 'none';
+      document.getElementById('dd-trigger').classList.remove('is-invalid');
+
+      // Update WA preview contact
+      document.getElementById('wa-contact-name').textContent = selectedSiswa.nama_ortu || 'Orang Tua Siswa';
+      document.getElementById('wa-contact-num').textContent = '+62 ' + (selectedSiswa.wa_ortu || '—').replace(/^0/, '');
+
+      closeDropdown();
+      updateWAPreview();
+    }
+
+    function clearSiswaSelection() {
+      selectedSiswa = null;
+      document.getElementById('dd-trigger').value = '';
+      document.getElementById('dd-clear').classList.remove('visible');
+      document.getElementById('selected-strip').classList.remove('visible');
+      document.getElementById('wa-contact-name').textContent = 'Orang Tua Siswa';
+      document.getElementById('wa-contact-num').textContent = '+62 —';
+      updateWAPreview();
+    }
+
+    // ── Jenis → update preview ───────────────────────────────
+    function updatePoinPreview() {
+      const sel = document.getElementById('f-jenis');
+      const preview = document.getElementById('poin-preview');
+      const inner = document.getElementById('poin-preview-inner');
+      const label = document.getElementById('poin-label');
+      const angka = document.getElementById('poin-angka');
+      const icon = document.getElementById('poin-icon');
+      const kontribEl = document.getElementById('poin-kontribusi-text');
+
+      if (sel.selectedIndex <= 0) {
+        preview.style.display = 'none';
+        return;
+      }
+
+      const opt = sel.options[sel.selectedIndex];
+      const poin = parseInt(opt.getAttribute('data-poin')) || 1;
+      const tingkat = opt.getAttribute('data-tingkat') || 'rendah';
+
+      // Konfigurasi per tingkat
+      const cfg = {
+        rendah: { emoji: '🟡', text: 'Ringan', bg: 'var(--success-light)', color: 'var(--success)', border: '#bbf7d0', iconCls: 'fa-circle-minus' },
+        sedang: { emoji: '🟠', text: 'Sedang', bg: 'var(--warning-light)', color: '#b45309', border: '#fde68a', iconCls: 'fa-circle-exclamation' },
+        berat: { emoji: '🔴', text: 'Berat', bg: 'var(--danger-light)', color: 'var(--danger)', border: '#fecaca', iconCls: 'fa-circle-xmark' },
+      };
+      const c = cfg[tingkat] || cfg['rendah'];
+
+      // Hitung kontribusi ke persentase siswa (jika siswa sudah dipilih)
+      let kontribText = `Menambahkan ${poin} poin (dari maks 3 per pelanggaran)`;
+      if (selectedSiswa) {
+        const jmlSekarang = (selectedSiswa.total_pelanggaran || 0);
+        const poinSekarang = (selectedSiswa.total_poin || 0);
+        const jmlBaru = jmlSekarang + 1;
+        const poinBaru = poinSekarang + poin;
+        const pctBaru = Math.round((poinBaru / (jmlBaru * 3)) * 100);
+        kontribText = `Setelah input: ${poinBaru}/(${jmlBaru}×3) = ${pctBaru}%`;
+      }
+
+      // Apply styles
+      inner.style.background = c.bg;
+      inner.style.color = c.color;
+      inner.style.borderColor = c.border;
+      icon.className = `fa-solid ${c.iconCls}`;
+      label.textContent = `${c.emoji} ${c.text}`;
+      angka.textContent = `${poin} poin`;
+      if (kontribEl) kontribEl.textContent = kontribText;
+      preview.style.display = 'block';
+    }
+
+
+    document.getElementById('f-jenis').addEventListener('change', function () {
+      updatePoinPreview();
+      updateWAPreview();
+      // Clear error
+      document.getElementById('err-jenis').style.display = 'none';
+      this.classList.remove('is-invalid');
+    });
+
+    // ── Tindak lanjut ─────────────────────────────────────────
+    document.querySelectorAll('input[name="tindak_lanjut"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        document.querySelectorAll('.tl-option').forEach(opt => opt.classList.remove('active'));
+        this.closest('.tl-option').classList.add('active');
+        updateWAPreview();
+      });
+    });
+
+    function getTindakLanjut() {
+      const checked = document.querySelector('input[name="tindak_lanjut"]:checked');
+      return checked ? checked.value : 'sekolah';
+    }
+
+    // ── Tanggal change ────────────────────────────────────────
+    document.getElementById('f-tanggal').addEventListener('change', function () {
+      updateWAPreview();
+      document.getElementById('err-tanggal').style.display = 'none';
+      this.classList.remove('is-invalid');
+    });
+
+    // ── Keterangan char count ──────────────────────────────────
+    document.getElementById('f-keterangan').addEventListener('input', function () {
+      const len = this.value.length;
+      if (len > MAX_KETERANGAN) this.value = this.value.substring(0, MAX_KETERANGAN);
+      const cnt = document.getElementById('char-count-val');
+      cnt.textContent = Math.min(len, MAX_KETERANGAN);
+      cnt.parentElement.className = len > MAX_KETERANGAN * 0.85 ? 'char-count warn' : 'char-count';
+      updateWAPreview();
+    });
+
+    // ── WA Toggle ─────────────────────────────────────────────
+    const waCheckbox = document.getElementById('f-send-wa');
+    const waToggleWrap = document.getElementById('wa-toggle-wrap');
+
+    waCheckbox.addEventListener('change', function () {
+      waToggleWrap.classList.toggle('active', this.checked);
+      updateWAPreview();
+
+      const notice = document.getElementById('wa-disabled-notice');
+      if (notice) notice.style.display = this.checked ? 'none' : 'flex';
+
+      const checkIcon = document.getElementById('wa-check-icon');
+      if (checkIcon) checkIcon.style.opacity = this.checked ? '1' : '0.3';
+    });
+
+    waToggleWrap.addEventListener('click', function (e) {
+      if (e.target.closest('label')) return;
+      waCheckbox.checked = !waCheckbox.checked;
+      waCheckbox.dispatchEvent(new Event('change'));
+    });
+
+    // Helper for date formatting
+    function formatTanggal(tanggalStr, withDay = false) {
+      if (!tanggalStr) return '';
+      const d = new Date(tanggalStr + 'T00:00:00');
+      const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const tglTeks = `${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`;
+      return withDay ? `${HARI[d.getDay()]}, ${tglTeks}` : tglTeks;
+    }
+    function getNowTime() {
+      const d = new Date();
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+
+    // ── WA Preview ────────────────────────────────────────────
+    function updateWAPreview() {
+      const namaSiswa = selectedSiswa ? selectedSiswa.nama : null;
+      const namaOrtu = selectedSiswa ? (selectedSiswa.nama_ortu || null) : null;
+      const hubOrtu = selectedSiswa ? (selectedSiswa.hubungan_ortu || null) : null;
+
+      const kelasSiswa = selectedSiswa ? (selectedSiswa.kelas || null) : null;
+      const jurusanSiswa = selectedSiswa ? (jurusanLabel(selectedSiswa) || null) : null;
+      const genderSiswa = selectedSiswa ? (genderLabel(selectedSiswa) || null) : null;
+      const sebutan = genderSiswa === 'Laki-laki' ? 'putra' : genderSiswa === 'Perempuan' ? 'putri' : 'putra/putri';
+
+      const jenisSel = document.getElementById('f-jenis');
+      const jenis = jenisSel.selectedIndex > 0
+        ? jenisSel.options[jenisSel.selectedIndex].getAttribute('data-nama') : '';
+      const tanggal = document.getElementById('f-tanggal').value;
+      const keterangan = document.getElementById('f-keterangan').value.trim();
+      const sendWA = waCheckbox.checked;
+      const tindakLanjut = getTindakLanjut();
+
+      // ── Date chip & waktu ───────────────────────────────
+      const dateChip = document.getElementById('wa-date-chip');
+      if (tanggal) {
+        const d = new Date(tanggal + 'T00:00:00');
+        const BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
+        dateChip.textContent = `${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`;
+      } else {
+        dateChip.textContent = 'Hari ini';
+      }
+      document.getElementById('wa-time-display').textContent = getNowTime();
+
+      // ── Nama sekolah ────────────────────────────────────
+      const schoolName = (typeof SIGAP_CONFIG !== 'undefined' && SIGAP_CONFIG.namaSekolah)
+        ? SIGAP_CONFIG.namaSekolah : 'SMK Negeri 1 Masbagik';
+      const waSchoolEl = document.getElementById('wa-school-name');
+      if (waSchoolEl) waSchoolEl.textContent = schoolName;
+
+      // ── Helper builders ─────────────────────────────────
+      const ph = t => `<span class="wa-placeholder">${t}</span>`;
+      const bold = t => `<span class="wa-b">${t}</span>`;
+      const lbl = t => `<span class="wa-label">${t}</span>`;
+      const row = (emoji, label, value) =>
+        `<div class="wa-row"><span class="wa-row-emoji">${emoji}</span>` +
+        `<span class="wa-row-content">${lbl(label)} ${value}</span></div>`;
+      const sep = () => `<span class="wa-sep"></span>`;
+
+      // ── Tanggal format panjang ──────────────────────────
+      const tglDisplay = tanggal ? formatTanggal(tanggal, true) : ph('[Tanggal]');
+
+      // ── Tindak lanjut block ─────────────────────────────
+      let tindakHTML = '';
+      if (tindakLanjut === 'hadir') {
+        tindakHTML =
+          `<div class="wa-tindak-block">` +
+          `📌 ${lbl('Tindak Lanjut:')} Bapak/Ibu dimohon untuk ` +
+          `${bold('hadir ke sekolah')} guna pertemuan dengan Guru BK untuk penyelesaian lebih lanjut.` +
+          `</div>`;
+      } else {
+        tindakHTML =
+          `<div class="wa-tindak-block">` +
+          `📌 ${lbl('Tindak Lanjut:')} Masalah ini telah ${bold('ditangani oleh Guru BK')} di sekolah. ` +
+          `Bapak/Ibu ${bold('tidak perlu hadir')} ke sekolah.` +
+          `</div>`;
+      }
+
+      // ── Sapaan pembuka ──────────────────────────────────
+      let sapaanHTML = '';
+      if (namaOrtu) {
+        const hubLabel = hubOrtu ? ` (${hubOrtu})` : '';
+        sapaanHTML =
+          `Yth. ${bold('Bapak/Ibu ' + namaOrtu + hubLabel)},<br>` +
+          `Orang tua/wali dari ${namaSiswa ? bold('*' + namaSiswa + '*') : ph('[Nama Siswa]')}`;
+      } else {
+        sapaanHTML =
+          `Yth. Orang tua/wali dari ` +
+          (namaSiswa ? bold('*' + namaSiswa + '*') : ph('[Nama Siswa]'));
+      }
+
+      // ══════════════════════════════════════════════════
+      // RENDER PESAN — struktur profesional
+      // ══════════════════════════════════════════════════
+      const previewEl = document.getElementById('wa-preview-text');
+      previewEl.innerHTML = [
+
+        // Pembuka
+        sapaanHTML,
+        `<br><br>`,
+        `Kami informasikan bahwa ${sebutan} Bapak/Ibu tercatat melakukan `,
+        `${bold('pelanggaran tata tertib sekolah')}:`,
+        `<br>`,
+
+        // Separator
+        sep(),
+
+        // Identitas siswa
+        row('👤', 'Nama:', namaSiswa ? bold(namaSiswa) : ph('[Nama Siswa]')),
+        row('🏫', 'Kelas:', kelasSiswa ? kelasSiswa : ph('[Kelas]')),
+        row('🎓', 'Jurusan:', jurusanSiswa ? jurusanSiswa : ph('[Jurusan]')),
+        row('🚻', 'Jenis Kelamin:', genderSiswa ? genderSiswa : ph('[Jenis Kelamin]')),
+
+        // Separator
+        sep(),
+
+        // Detail pelanggaran
+        row('📋', 'Jenis Pelanggaran:', jenis ? bold(jenis) : ph('[Jenis Pelanggaran]')),
+        row('📅', 'Tanggal:', tglDisplay),
+        row('📝', 'Keterangan:', keterangan ? keterangan : ph('[Keterangan]')),
+
+        // Separator
+        sep(),
+
+        // Tindak lanjut
+        tindakHTML,
+
+        // Penutup
+        `<br>Mohon kerjasamanya dalam membimbing ${sebutan} Bapak/Ibu agar `,
+        `tidak mengulangi pelanggaran serupa.<br>`,
+        `Apabila ada pertanyaan, silakan hubungi Guru BK kami.<br>`,
+
+        // Salam
+        `<br>`,
+        `<span class="wa-footer-block">`,
+        `Hormat kami,<br>`,
+        `${bold('Guru BK SIGAP')}<br>`,
+        `${bold(schoolName)}`,
+        `</span>`,
+
+      ].join('');
+
+      // ── Status chip preview ─────────────────────────────
+      const statusEl = document.getElementById('preview-status');
+      if (sendWA) {
+        statusEl.className = 'preview-status';
+        statusEl.innerHTML = '<span class="dot"></span><span>Live preview</span>';
+      } else {
+        statusEl.className = 'preview-status inactive';
+        statusEl.innerHTML = '<span class="dot"></span><span>WA dinonaktifkan</span>';
+      }
+    }
+
+    // ── Initial preview ───────────────────────────────────────
+    updateWAPreview();
+
+    // ── Form validation ───────────────────────────────────────
+    function clearAllErrors() {
+      ['err-siswa', 'err-jenis', 'err-tanggal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      document.getElementById('dd-trigger').classList.remove('is-invalid');
+      document.getElementById('f-jenis').classList.remove('is-invalid');
+      document.getElementById('f-tanggal').classList.remove('is-invalid');
+    }
+
+    function validateForm() {
+      clearAllErrors();
+      let valid = true;
+
+      if (!selectedSiswa) {
+        document.getElementById('err-siswa').style.display = 'flex';
+        document.getElementById('dd-trigger').classList.add('is-invalid');
+        valid = false;
+      }
+
+      const jenis = document.getElementById('f-jenis').value;
+      if (!jenis) {
+        document.getElementById('err-jenis').style.display = 'flex';
+        document.getElementById('f-jenis').classList.add('is-invalid');
+        valid = false;
+      }
+
+      const tanggal = document.getElementById('f-tanggal').value;
+      if (!tanggal) {
+        document.getElementById('err-tanggal').style.display = 'flex';
+        document.getElementById('f-tanggal').classList.add('is-invalid');
+        valid = false;
+      }
+
+      return valid;
+    }
+
+    // ── Submit ────────────────────────────────────────────────
+    document.getElementById('btn-submit').addEventListener('click', async function () {
+      if (!validateForm()) {
+        // Scroll ke error pertama
+        const firstErr = document.querySelector('.form-error[style*="flex"]');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const btn = this;
+      const spinner = document.getElementById('submit-spinner');
+      const text = document.getElementById('submit-text');
+      const sendWA = waCheckbox.checked;
+
+      // Loading state
+      btn.disabled = true;
+      text.style.display = 'none';
+      spinner.style.display = 'inline-block';
+
+      const jenisId = document.getElementById('f-jenis').value;
+      const tanggal = document.getElementById('f-tanggal').value;
+      const keterangan = document.getElementById('f-keterangan').value.trim();
+      const tindakLanjut = getTindakLanjut();
+
+      const inputs = {
+        action: 'tambah',
+        siswa_id: selectedSiswa.id,
+        jenis_pelanggaran_id: jenisId,
+        tanggal: tanggal,
+        keterangan: keterangan,
+        tindak_lanjut: tindakLanjut,
+        kirim_wa: sendWA ? '1' : '0'
+      };
+
+      const res = await apiRequest('api/pelanggaran.php', {
+        method: 'POST',
+        body: toFormData(inputs)
+      });
+
+      // Reset loading
+      btn.disabled = false;
+      text.style.display = 'inline';
+      spinner.style.display = 'none';
+
+      if (res && res.success) {
+        const record = res.data;
+
+        // Hitung info persentase dari response API
+        const totalPoin = record.siswa_total_poin ?? 0;
+        const jumlahPel = record.siswa_jumlah_pel ?? 0;
+        const persentase = record.siswa_persentase ?? 0;
+        const namaSiswa = selectedSiswa.nama || 'siswa';
+        const waOrtu = selectedSiswa.wa_ortu || 'orang tua siswa';
+
+        // Tampilkan success overlay
+        document.getElementById('form-body').style.display = 'none';
+        const overlay = document.getElementById('success-overlay');
+        overlay.classList.add('visible');
+
+        // Update deskripsi dengan info poin & persentase
+        const descEl = document.getElementById('success-desc');
+        let waInfo;
+        if (!sendWA) {
+          waInfo = 'Notifikasi WA tidak dikirim.';
+        } else if (record.wa_status === 'Terkirim') {
+          waInfo = `Notifikasi WA telah dikirim ke ${waOrtu}.`;
+        } else {
+          waInfo = `<span style="color:#b91c1c;font-weight:600;">⚠️ Notifikasi WA GAGAL dikirim: ${record.wa_error || 'penyebab tidak diketahui'}.</span><br>Data pelanggaran tetap tersimpan; kirim ulang dari daftar pelanggaran.`;
+        }
+
+        const pctLabel = persentase < 34 ? '🟢 Ringan'
+          : persentase < 67 ? '🟠 Sedang'
+            : '🔴 Berat';
+
+        descEl.innerHTML = `
+          <strong>${namaSiswa}</strong> berhasil dicatat.<br>
+          ${waInfo}<br>
+          <span style="margin-top:8px; display:inline-block; font-size:12px;
+            padding:4px 10px; border-radius:100px; background:#f0fdf4;
+            color:#15803d; font-weight:700; border:1px solid #bbf7d0;">
+            Akumulasi: ${totalPoin} poin dari ${jumlahPel} pelanggaran
+            = ${Math.round(persentase)}% ${pctLabel}
+          </span>`;
+
+        if (typeof showToast === 'function') {
+          showToast({
+            type: 'success',
+            title: 'Berhasil Disimpan!',
+            message: res.message || `Pelanggaran ${namaSiswa} dicatat.`,
+            duration: 4000,
+          });
+        }
+      } else {
+        alert('Error: ' + (res?.message || 'Terjadi kesalahan saat menyimpan pelanggaran.'));
+      }
+    });
+
+    // ── Reset / Input Lagi ────────────────────────────────────
+    function resetForm() {
+      clearSiswaSelection();
+      ['f-filter-kelas', 'f-filter-jurusan', 'f-filter-gender'].forEach(id => { document.getElementById(id).value = ''; });
+      updateFilterCount();
+      document.getElementById('f-jenis').value = '';
+      document.getElementById('f-tanggal').value = todayISO;
+      document.getElementById('f-keterangan').value = '';
+      document.getElementById('char-count-val').textContent = '0';
+      // Reset tindak lanjut ke default (sekolah)
+      const defaultRadio = document.querySelector('input[name="tindak_lanjut"][value="sekolah"]');
+      if (defaultRadio) { defaultRadio.checked = true; }
+      document.querySelectorAll('.tl-option').forEach(opt => opt.classList.remove('active'));
+      const tlSekolah = document.getElementById('tl-sekolah');
+      if (tlSekolah) tlSekolah.classList.add('active');
+      waCheckbox.checked = true;
+      waToggleWrap.classList.add('active');
+      clearAllErrors();
+      updateWAPreview();
+    }
+
+    document.getElementById('btn-reset').addEventListener('click', resetForm);
+
+    document.getElementById('btn-input-lagi').addEventListener('click', function () {
+      document.getElementById('form-body').style.display = 'block';
+      document.getElementById('success-overlay').classList.remove('visible');
+      resetForm();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+
+    // ── Dark Mode ─────────────────────────────────────────────
+    (function () {
+      const html = document.documentElement;
+      const STORAGE = 'sigap_darkmode';
+      if (localStorage.getItem(STORAGE) === '1') html.classList.add('dark');
+      function setDark(on) {
+        html.classList.add('dark-transitioning');
+        setTimeout(() => html.classList.remove('dark-transitioning'), 300);
+        if (on) { html.classList.add('dark'); localStorage.setItem(STORAGE, '1'); }
+        else { html.classList.remove('dark'); localStorage.setItem(STORAGE, '0'); }
+        updateIcon();
+      }
+      function updateIcon() {
+        const isDark = html.classList.contains('dark');
+        const icon = document.getElementById('dm-icon');
+        const btn = document.getElementById('btn-darkmode');
+        if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        if (btn) btn.title = isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap';
+      }
+      document.addEventListener('DOMContentLoaded', function () {
+        updateIcon();
+        const btn = document.getElementById('btn-darkmode');
+        if (btn) btn.addEventListener('click', function () { setDark(!html.classList.contains('dark')); });
+      });
+    })();
+
+    // ── Close info panel ─────────────────────────────────────
+    (function () {
+      const closeBtn = document.getElementById('close-info');
+      if (!closeBtn) return;
+      closeBtn.addEventListener('click', function () {
+        const panel = document.getElementById('info-panel');
+        panel.style.transition = 'opacity 0.3s, max-height 0.4s';
+        panel.style.overflow = 'hidden';
+        panel.style.opacity = '0';
+        panel.style.maxHeight = '0';
+        panel.style.marginBottom = '0';
+        panel.style.padding = '0';
+      });
+    })();
+
+    // ── Init modals (for any future modals) ───────────────────
+    if (typeof initModals === 'function') {
+      initModals();
+    }
+
+    // ── Logout confirmation ───────────────────────────────────
+    (function () {
+      const overlay = document.getElementById('modalKeluarOverlay');
+      const btnOk = document.getElementById('btn-konfirmasi-keluar');
+      const btnBatal = document.getElementById('btn-batal-keluar');
+
+      function openModal() { overlay.classList.add('active'); }
+      function closeModal() {
+        overlay.classList.remove('active');
+        btnOk.disabled = false;
+        btnOk.textContent = 'Ya, Keluar';
+      }
+
+      document.querySelectorAll('[data-logout]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openModal();
+        }, true);
+      });
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+      });
+
+      btnBatal.addEventListener('click', closeModal);
+
+      btnOk.addEventListener('click', function () {
+        btnOk.disabled = true;
+        btnOk.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" style="margin-right:6px;"></i> Keluar…';
+        setTimeout(function () {
+          closeModal();
+          localStorage.clear();
+          sessionStorage.clear();
+          if (typeof logout === 'function') { try { logout(); } catch (e) { } }
+          window.location.href = 'login.html';
+        }, 500);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+      });
+    })();
+
+  </script>
+</body>
+
+</html>

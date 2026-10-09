@@ -1,0 +1,44 @@
+[2026-10-04 11:37:53] [INFO] [127.0.0.1] Login berhasil: admin (role: admin)
+[2026-10-04 12:24:09] [INFO] [127.0.0.1] Login berhasil: admin (role: admin)
+[2026-10-04 12:44:03] [INFO] [127.0.0.1] Siswa ditambahkan: rahman 334 (ID: 13) oleh admin
+[2026-10-04 12:44:18] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 1 (Andi Prasetyo) oleh admin
+[2026-10-04 12:44:20] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 6 (Anisa Putri Maharani) oleh admin
+[2026-10-04 12:44:23] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 3 (Budi Santoso) oleh admin
+[2026-10-04 12:44:57] [ERROR] [127.0.0.1] WASender send() gagal ke 626283848160290: cURL error: SSL connection timeout
+[2026-10-04 12:44:57] [INFO] [127.0.0.1] Pelanggaran ditambahkan: P018 untuk rahman 334, WA: Gagal, oleh admin
+[2026-10-04 12:47:15] [INFO] [127.0.0.1] Update status penanganan id=18 → Sedang Diproses
+[2026-10-04 12:51:53] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 8 (Nur Halimah) oleh admin
+[2026-10-04 12:52:17] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 12 (Ayu Sekar Ningrum) oleh admin
+[2026-10-04 12:52:19] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 11 (Daffa Rayhan Pratama) oleh admin
+[2026-10-04 12:52:21] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 4 (Dewi Lestari) oleh admin
+[2026-10-04 12:52:23] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 7 (Fajar Nugroho) oleh admin
+[2026-10-04 12:52:25] [INFO] [127.0.0.1] Siswa dinonaktifkan: ID 9 (Kevin Ardiansyah) oleh admin
+[2026-10-04 12:54:26] [INFO] [127.0.0.1] Login berhasil: admin (role: admin)
+[2026-10-04 12:58:29] [ERROR] [127.0.0.1] WASender send() gagal ke 626283848160290: cURL error: Failed to connect to api.fonnte.com port 443 after 10014 ms: Timeout was reached
+[2026-10-04 12:58:29] [INFO] [127.0.0.1] Pelanggaran ditambahkan: P019 untuk rahman 334, WA: Gagal, oleh admin
+[2026-10-04 12:58:55] [ERROR] [127.0.0.1] WASender send() gagal ke 626283848160290: cURL error: Failed to connect to api.fonnte.com port 443 after 10007 ms: Timeout was reached
+[2026-10-04 12:58:55] [INFO] [127.0.0.1] Pelanggaran ditambahkan: P020 untuk rahman 334, WA: Gagal, oleh admin
+[2026-10-04 12:59:17] [WARNING] [127.0.0.1] WASender: Pengiriman gagal ke 626283848160290 (HTTP 200). Reason: target input invalid. Raw: {"reason":"target input invalid","requestid":1025711277,"status":false,"target":"626283848160290"}
+[2026-10-04 12:59:17] [INFO] [127.0.0.1] Pelanggaran ditambahkan: P021 untuk rahman 334, WA: Gagal, oleh admin
+[2026-10-04 13:01:25] [INFO] [127.0.0.1] Update status penanganan id=21 → Sudah Selesai
+[2026-10-04 13:01:27] [INFO] [127.0.0.1] Update status penanganan id=21 → Sedang Diproses
+[2026-10-04 13:10:34] [INFO] [127.0.0.1] Login berhasil: sriwahyuni (role: guru_bk)
+[2026-10-04 15:54:11] [INFO] [127.0.0.1] Login berhasil: admin (role: admin)
+[2026-10-04 16:10:10] [WARNING] [127.0.0.1] WASender: Pengiriman gagal ke 626283848160290 (HTTP 200). Reason: target input invalid. Raw: {"reason":"target input invalid","requestid":1025888341,"status":false,"target":"626283848160290"}
+[2026-10-04 16:10:10] [INFO] [127.0.0.1] Pelanggaran ditambahkan: P022 untuk rahman 334, WA: Gagal, oleh admin
+[2026-10-04 16:13:16] [INFO] [127.0.0.1] Siswa diupdate: ID 13 (rahman 334) oleh admin
+[2026-10-04 16:13:31] [INFO] [127.0.0.1] WASender: Pesan terkirim ke 6283848160290.
+[2026-10-04 16:13:31] [INFO] [127.0.0.1] Pelanggaran ditambahkan: P023 untuk rahman 334, WA: Terkirim, oleh admin
+[2026-10-04 16:14:32] [INFO] [127.0.0.1] Update status penanganan id=23 → Sudah Selesai
+[2026-10-04 16:25:19] [INFO] [CLI] Akun Guru BK dibuat via CLI: wawan_setiawan221
+[2026-10-04 16:25:51] [INFO] [127.0.0.1] Login berhasil: wawan_setiawan221 (role: guru_bk)
+[2026-10-04 16:36:23] [INFO] [127.0.0.1] Login berhasil: admin (role: admin)
+[2026-10-04 16:39:05] [INFO] [127.0.0.1] Siswa ditambahkan: Alpi (ID: 14) oleh admin
+[2026-10-04 16:39:35] [INFO] [127.0.0.1] WASender: Pesan terkirim ke 6285953760843.
+[2026-10-04 16:39:35] [INFO] [127.0.0.1] Pelanggaran ditambahkan: P024 untuk Alpi, WA: Terkirim, oleh admin
+[2026-10-04 18:08:51] [INFO] [127.0.0.1] Login berhasil: admin (role: admin)
+[2026-10-04 19:48:39] [INFO] [127.0.0.1] Login berhasil: admin (role: admin)
+[2026-10-04 19:52:27] [INFO] [127.0.0.1] Siswa ditambahkan: dree (ID: 15) oleh admin
+[2026-10-04 19:52:49] [INFO] [127.0.0.1] WASender: Pesan terkirim ke 62895329125569.
+[2026-10-04 19:52:49] [INFO] [127.0.0.1] Pelanggaran ditambahkan: P025 untuk dree, WA: Terkirim, oleh admin
+[2026-10-05 09:05:06] [INFO] [127.0.0.1] Login berhasil: admin (role: admin)

@@ -1,0 +1,11 @@
+[04-Oct-2026 11:21:51 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sigap_db.pelanggaran' doesn't exist in C:\Users\rahma\Music\skripsi\api\laporan.php:93
+Stack trace:
+#0 C:\Users\rahma\Music\skripsi\api\laporan.php(93): PDO->prepare('SELECT\n        ...')
+#1 {main}
+  thrown in C:\Users\rahma\Music\skripsi\api\laporan.php on line 93
+[04-Oct-2026 11:21:51 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'sigap_db.siswa' doesn't exist in C:\Users\rahma\Music\skripsi\api\siswa.php:98
+Stack trace:
+#0 C:\Users\rahma\Music\skripsi\api\siswa.php(98): PDO->prepare('SELECT COUNT(*)...')
+#1 C:\Users\rahma\Music\skripsi\api\siswa.php(29): getSiswaList()
+#2 {main}
+  thrown in C:\Users\rahma\Music\skripsi\api\siswa.php on line 98
